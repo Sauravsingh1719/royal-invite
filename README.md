@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 👑 RoyalInvites — Cinematic Digital Wedding Invitations SaaS
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-16.3.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+[![NextAuth](https://img.shields.io/badge/Auth-NextAuth.js-purple?style=for-the-badge&logo=nextauth)](https://next-auth.js.org/)
+[![Cloudinary](https://img.shields.io/badge/Media-Cloudinary-blue?style=for-the-badge&logo=cloudinary)](https://cloudinary.com/)
 
-First, run the development server:
+**RoyalInvites** is a full-stack SaaS platform crafted for couples and event creators to design, customize, and share cinematic, royal digital wedding invitations. Featuring royal envelope unboxing animations, dynamic guest personalization, curated traditional wedding soundtracks, and modular extensible templates.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 💌 1. Cinematic Guest Unboxing Experience
+* **Interactive Envelope Opening:** Guests receive a personalized, wax-sealed royal envelope with smooth Framer Motion unfold transitions.
+* **Synchronized Audio Auto-Play:** Ambient wedding music begins immediately upon unboxing the invitation.
+* **Dynamic Guest Personalization:** Generates custom invite links with guest names dynamically rendered across the invitation (`/slug?guest=FamilyName`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🎨 2. Dynamic Template Registry Architecture
+* **Decoupled Design Engine:** Templates are registered via an isolated Registry Pattern (`registry.ts`), enabling new wedding themes (`DesignOne` to `DesignFour`) to be added without altering core platform logic.
+* **Live Template Showcase:** Interactive `/templates` gallery enabling users to preview themes with sample data before building.
 
-## Learn More
+### 🎵 3. Royalty-Free Audio Engine
+* **Curated Wedding Tracks:** Built-in traditional and classical presets (`Audio 1` through `Audio 5`).
+* **In-Builder Live Audio Testing:** Play/Pause previews directly inside the invite builder before publishing.
 
-To learn more about Next.js, take a look at the following resources:
+### 🖼️ 4. Client-Side Image Auto-Compression
+* **Zero Payload Crashes:** Utilizes client-side Web Workers (`browser-image-compression`) to resize 30MB+ camera/phone photos to 1080p/2K (~800KB) in milliseconds before upload.
+* **Serverless Optimized:** Guarantees all uploads stay well within Vercel’s 4.5 MB serverless execution limits while retaining 100% retina clarity on Cloudinary.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🔐 5. Two-Step Email OTP Authentication & Moderation
+* **Passwordless / 2FA Security:** Email OTP verification powered by Nodemailer for all registrations and sign-ins.
+* **Creator Dashboard:** Real-time wedding invite management, guest RSVP metrics, and URL sharing.
+* **Admin Control Center:** Dedicated administrative dashboard to manage creators, audit invites, and monitor platform health.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🛠️ Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 16 (App Router, Turbopack, Server Actions) |
+| **Language** | TypeScript |
+| **Styling & Animation** | Tailwind CSS, Framer Motion, Lucide React Icons |
+| **Database** | MongoDB Atlas with Mongoose ORM |
+| **Authentication** | NextAuth.js (JWT Strategy, Credentials Provider + OTP) |
+| **Email Service** | Nodemailer (Custom HTML Royal Email Templates) |
+| **Media Pipeline** | Cloudinary API + `browser-image-compression` |
+| **Deployment** | Vercel (Edge Proxy / Middleware) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📂 Project Structure
+
+```plaintext
+royalinvites/
+├── public/
+│   ├── audio/              # Preloaded wedding soundtracks (audio1.mp3 to audio5.mp3)
+│   ├── logo.jpg            # Royal platform logo and tab favicon
+│   ├── bride.jpg           # Default fallback assets
+│   ├── groom.jpg
+│   └── couple.jpg
+├── src/
+│   ├── actions/            # Next.js Server Actions (Cloudinary uploads)
+│   ├── app/                # Next.js App Router
+│   │   ├── (auth)/         # Sign In & Sign Up flows
+│   │   ├── [slug]/         # Dynamic public wedding invitation routes
+│   │   ├── admin/          # Admin moderation portal
+│   │   ├── api/            # API endpoints (Auth, OTP, Weddings, Guests)
+│   │   ├── builder/        # Interactive wedding creator studio
+│   │   ├── dashboard/      # User management center
+│   │   ├── templates/      # Template preview showcase
+│   │   ├── layout.tsx      # Root layout & SEO metadata
+│   │   └── page.tsx        # Landing page
+│   ├── components/         # Reusable UI components (AudioSelector, ImageUploader, etc.)
+│   ├── lib/                # Database connection, email templates, Nodemailer client
+│   ├── models/             # Mongoose schemas (User, Wedding, Guest)
+│   ├── templates/          # Extensible template engine & registry
+│   │   ├── designs/        # Custom template designs (DesignOne to DesignFour)
+│   │   └── registry.ts     # Central Template Registry
+│   └── proxy.ts            # Edge gateway & route protection (Middleware)
+├── .env.example
+├── next.config.ts
+├── package.json
+└── tsconfig.json
