@@ -1,18 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight, Globe, Smile, Layers } from "lucide-react";
+import { Sparkles, ArrowRight, Globe, Smile } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
 import AudioSelector from "@/components/AudioSelector";
 import { getAllTemplates } from "@/templates/registry";
 import { AUDIO_PRESETS } from "@/lib/audio-presets";
 
 export default function BuilderPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const availableTemplates = getAllTemplates();
+
+  // Native NextAuth authentication gate with zero client-side race condition
+  const { data: session, status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.replace("/signin?callbackUrl=/builder");
+    },
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,7 +28,7 @@ export default function BuilderPage() {
   const [formData, setFormData] = useState({
     slug: "",
     templateId: availableTemplates[0]?.id || "design-one",
-    musicUrl: AUDIO_PRESETS[0].url,
+    musicUrl: AUDIO_PRESETS[0]?.url || "/audio/audio1.mp3",
     bride: {
       name: "",
       parents: "D/o Smt. Sangeeta & Shri Manoj Singh",
@@ -90,12 +97,6 @@ export default function BuilderPage() {
     updatedTraits[index] = value;
     setFormData({ ...formData, groom: { ...formData.groom, traits: updatedTraits } });
   };
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/signin?callbackUrl=/builder");
-    }
-  }, [status, router]);
 
   if (status === "loading") {
     return (

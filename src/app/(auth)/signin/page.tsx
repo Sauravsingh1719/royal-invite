@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
-import { signIn, getSession } from "next-auth/react";
+import React, { useState, useEffect, Suspense } from "react";
+import { signIn, getSession, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Lock, Mail, AlertCircle, KeyRound, ArrowLeft, CheckCircle2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  AlertCircle,
+  KeyRound,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 
 function SignInContent() {
@@ -12,6 +22,8 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const wasRegistered = searchParams.get("registered") === "true";
+
+  const { data: session, status } = useSession();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
@@ -21,6 +33,20 @@ function SignInContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // 1. Auto-redirect if user is already logged in (resolves callbackUrl immediately)
+  useEffect(() => {
+    if (status === "authenticated") {
+      const isAdmin = (session?.user as any)?.role === "admin";
+      if (callbackUrl) {
+        router.replace(callbackUrl);
+      } else if (isAdmin) {
+        router.replace("/admin");
+      } else {
+        router.replace("/dashboard");
+      }
+    }
+  }, [status, session, callbackUrl, router]);
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,22 +95,33 @@ function SignInContent() {
         return;
       }
 
-      // Check role dynamically to route admins to /admin and creators to /dashboard
-      const session = await getSession();
-      const isAdmin = (session?.user as any)?.role === "admin";
+      const activeSession = await getSession();
+      const isAdmin = (activeSession?.user as any)?.role === "admin";
 
       if (callbackUrl) {
-        router.push(callbackUrl);
+        router.replace(callbackUrl);
       } else if (isAdmin) {
-        router.push("/admin");
+        router.replace("/admin");
       } else {
-        router.push("/dashboard");
+        router.replace("/dashboard");
       }
     } catch {
       setError("Authentication failed. Please try again.");
       setLoading(false);
     }
   };
+
+  // If already logged in, show a royal spinner while forwarding
+  if (status === "authenticated" || status === "loading") {
+    return (
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-12 border border-[#D4AF37]/30 text-center space-y-4">
+        <Loader2 className="w-8 h-8 text-[#8B1E41] animate-spin mx-auto" />
+        <p className="text-xs font-bold uppercase tracking-wider font-[family-name:var(--font-cinzel)] text-[#8B1E41]">
+          {status === "authenticated" ? "Entering Royal Portal..." : "Verifying session..."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-[#D4AF37]/30">
