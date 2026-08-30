@@ -207,13 +207,13 @@ export default function BuilderPage() {
                         By {template.author.name}
                       </p>
 
-                      {/* Dedicated Preview Button Opening in New Tab */}
+                      {/* Dedicated Preview Button Opening in New Tab with Query Param */}
                       <a
-                        href={`/templates?preview=${template.id}`}
+                        href={`/templates?template=${template.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B1E41] hover:text-[#5C1027] bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 px-2.5 py-1 rounded-lg transition-all border border-[#8B1E41]/20 shadow-2xs"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B1E41] hover:text-[#5C1027] bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 px-2.5 py-1 rounded-lg transition-all border border-[#8B1E41]/20 shadow-xs"
                         title={`Preview ${template.name} in a new tab`}
                       >
                         <Eye className="w-3 h-3" />
