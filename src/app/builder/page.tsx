@@ -5,7 +5,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Sparkles, ArrowRight, Globe, Smile, Layers } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
+import AudioSelector from "@/components/AudioSelector";
 import { getAllTemplates } from "@/templates/registry";
+import { AUDIO_PRESETS } from "@/lib/audio-presets";
 
 export default function BuilderPage() {
   const { data: session, status } = useSession();
@@ -19,6 +21,7 @@ export default function BuilderPage() {
   const [formData, setFormData] = useState({
     slug: "",
     templateId: availableTemplates[0]?.id || "design-one",
+    musicUrl: AUDIO_PRESETS[0].url,
     bride: {
       name: "",
       parents: "D/o Smt. Sangeeta & Shri Manoj Singh",
@@ -143,7 +146,7 @@ export default function BuilderPage() {
             Create Royal Wedding Invitation
           </h1>
           <p className="text-gray-600 text-sm mt-2 font-medium">
-            Enter the couple details, traits, upload photos, and generate your dynamic wedding website.
+            Enter the couple details, traits, soundtrack, upload photos, and generate your dynamic wedding website.
           </p>
         </div>
 
@@ -154,7 +157,6 @@ export default function BuilderPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          
           {/* Dynamic Template Selection Grid */}
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -324,6 +326,14 @@ export default function BuilderPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Sound Preset Selector */}
+          <div className="pt-6 border-t border-gray-200">
+            <AudioSelector
+              value={formData.musicUrl}
+              onChange={(url) => setFormData({ ...formData, musicUrl: url })}
+            />
           </div>
 
           {/* Website Link Preview */}
