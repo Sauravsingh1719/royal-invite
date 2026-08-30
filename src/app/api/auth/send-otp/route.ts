@@ -30,33 +30,25 @@ export async function POST(req: Request) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedOtp = await bcrypt.hash(otp, 10);
 
-    // 2. Persist to MongoDB first to ensure authorization will succeed
+    // 2. Persist to MongoDB
     user.otpToken = hashedOtp;
-    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes validity
     await user.save();
 
-    // 3. Fire-and-Forget: Dispatch email in background without blocking response
-    transporter
-      .sendMail({
-        from: EMAIL_FROM,
-        to: user.email,
-        subject: "Your RoyalInvites Verification Code",
-        html: getOtpTemplate(otp),
-      })
-      .then((info) => {
-        console.log(`[Background OTP Sent]: ${info.messageId} to ${user.email}`);
-      })
-      .catch((err) => {
-        console.error("[Background Email Failed]:", err);
-      });
+    // 3. Await SMTP delivery before terminating the serverless lambda
+    await transporter.sendMail({
+      from: EMAIL_FROM,
+      to: user.email,
+      subject: "Your RoyalInvites Verification Code",
+      html: getOtpTemplate(otp),
+    });
 
-    // 4. Return instant response to client
     return NextResponse.json({
       success: true,
-      message: "Verification code generated and dispatched",
+      message: "Verification code sent to your email",
     });
-  } catch (error) {
-    console.error("OTP generation error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("[OTP Send Error]:", error);
+    return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

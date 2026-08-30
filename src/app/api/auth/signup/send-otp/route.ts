@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     const normalizedEmail = email.toLowerCase().trim();
     const existingUser = await User.findOne({ email: normalizedEmail });
 
-    // Reject if a verified account already exists
     if (existingUser && existingUser.isVerified) {
       return NextResponse.json(
         { message: "An account with this email already exists. Please sign in." },
@@ -33,10 +32,9 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedOtp = await bcrypt.hash(otp, 10);
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes validity
 
     if (existingUser) {
-      // Re-use unverified record
       existingUser.name = name.trim();
       existingUser.password = hashedPassword;
       existingUser.otpToken = hashedOtp;
@@ -44,7 +42,6 @@ export async function POST(req: Request) {
       existingUser.isVerified = false;
       await existingUser.save();
     } else {
-      // Create new unverified user
       const newUser = new User({
         name: name.trim(),
         email: normalizedEmail,
@@ -56,23 +53,20 @@ export async function POST(req: Request) {
       await newUser.save();
     }
 
-    // Fire-and-forget background email dispatch
-    transporter
-      .sendMail({
-        from: EMAIL_FROM,
-        to: normalizedEmail,
-        subject: "Verify Your RoyalInvites Account",
-        html: getOtpTemplate(otp),
-      })
-      .then((info) => console.log(`[Signup OTP Sent]: ${info.messageId} to ${normalizedEmail}`))
-      .catch((err) => console.error("[Signup Email Error]:", err));
+    // Await email dispatch directly
+    await transporter.sendMail({
+      from: EMAIL_FROM,
+      to: normalizedEmail,
+      subject: "Verify Your RoyalInvites Account",
+      html: getOtpTemplate(otp),
+    });
 
     return NextResponse.json({
       success: true,
       message: "Verification code sent to your email",
     });
   } catch (error: any) {
-    console.error("Signup OTP error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    console.error("[Signup OTP Send Error]:", error);
+    return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
