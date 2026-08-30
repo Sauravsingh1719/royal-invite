@@ -1,26 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { ArrowRight, Info, Sparkles } from "lucide-react";
+import { ArrowRight, Info, Loader2 } from "lucide-react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getAllTemplates, getTemplate } from "@/templates/registry";
 import { sampleDesignOneWedding } from "@/lib/sample-wedding";
 
+export const dynamic = "force-dynamic";
+
 export default function TemplatesShowcasePage() {
   const templates = getAllTemplates();
-  const [activeTemplateId, setActiveTemplateId] = useState<string>(templates[0]?.id || "design-one");
+  const [activeTemplateId, setActiveTemplateId] = useState<string>(
+    templates[0]?.id || "design-one"
+  );
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const activeDefinition = getTemplate(activeTemplateId);
   const ActiveComponent = activeDefinition.component;
 
   return (
     <div className="relative min-h-screen bg-[#FDFBF7]">
-      
       {/* Sticky Switcher Header */}
       <div className="sticky top-16 z-40 px-4 py-3 bg-[#2A0410]/95 backdrop-blur-md border-b border-[#D4AF37]/50 shadow-xl text-white">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-          
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37]">
               <Info className="w-4 h-4" />
@@ -35,7 +42,7 @@ export default function TemplatesShowcasePage() {
             </div>
           </div>
 
-          {/* Dynamic Tabs Generated from Registry */}
+          {/* Dynamic Tabs from Registry */}
           <div className="flex items-center gap-2 flex-wrap justify-center">
             <div className="flex bg-black/40 p-1 rounded-full border border-[#D4AF37]/40">
               {templates.map((t) => (
@@ -61,17 +68,25 @@ export default function TemplatesShowcasePage() {
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-
         </div>
       </div>
 
-      <AudioPlayer
-        brideName={sampleDesignOneWedding.bride.name}
-        groomName={sampleDesignOneWedding.groom.name}
-      />
+      {/* Audio Envelope with Suspense Boundary */}
+      <Suspense fallback={null}>
+        <AudioPlayer
+          brideName={sampleDesignOneWedding.bride.name}
+          groomName={sampleDesignOneWedding.groom.name}
+        />
+      </Suspense>
 
-      {/* Dynamically Render the Component */}
-      <ActiveComponent wedding={sampleDesignOneWedding as any} />
+      {/* Dynamic Template Mount */}
+      {!mounted ? (
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-[#8B1E41] animate-spin" />
+        </div>
+      ) : (
+        <ActiveComponent wedding={sampleDesignOneWedding as any} />
+      )}
     </div>
   );
 }
