@@ -26,9 +26,12 @@ export async function uploadWeddingImage(formData: FormData): Promise<UploadResu
       return { success: false, error: "Only image files (JPG, PNG, WEBP) are allowed" };
     }
 
-    // Limit maximum upload size to 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      return { success: false, error: "Image exceeds maximum allowed size of 10MB" };
+    // Safety guard aligned with Vercel serverless limits (4.5MB)
+    if (file.size > 4.5 * 1024 * 1024) {
+      return {
+        success: false,
+        error: "Compressed image payload exceeds 4.5MB server limit",
+      };
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -42,7 +45,7 @@ export async function uploadWeddingImage(formData: FormData): Promise<UploadResu
             resource_type: "image",
             transformation: [
               {
-                width: 1200,
+                width: 1400,
                 crop: "limit",
                 quality: "auto:good",
                 fetch_format: "auto",

@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { UploadCloud, X, Loader2, CheckCircle2, ImagePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import imageCompression from "browser-image-compression";
 import { uploadWeddingImage } from "@/actions/upload";
 
 interface ImageUploaderProps {
@@ -19,10 +20,10 @@ export default function ImageUploader({
   value,
   onChange,
   aspectRatio = "portrait",
-  hint = "PNG, JPG up to 10MB",
+  hint = "Any size photo (Auto-compressed for ultra-fast loading)",
 }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [statusText, setStatusText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,30 +38,48 @@ export default function ImageUploader({
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file");
+      setError("Please select a valid image file (JPG, PNG, WEBP, HEIC)");
       return;
     }
 
-    setUploading(true);
     setError(null);
 
     try {
+      // 1. Client-Side Smart Compression
+      setStatusText("Optimizing high-res image...");
+      
+      const compressionOptions = {
+        maxSizeMB: 1.5, // Caps file size under 1.5MB
+        maxWidthOrHeight: 1920, // Downscales massive 4K/8K images to crisp 1080p/2K
+        useWebWorker: true,
+        fileType: "image/jpeg",
+        initialQuality: 0.88, // Retains 88% visual fidelity
+      };
+
+      const compressedBlob = await imageCompression(file, compressionOptions);
+      const compressedFile = new File([compressedBlob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+        type: "image/jpeg",
+      });
+
+      // 2. Upload the lightweight image to Cloudinary via Server Action
+      setStatusText("Uploading to Cloudinary...");
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", compressedFile);
 
       const res = await uploadWeddingImage(formData);
 
       if (!res.success || !res.url) {
         setError(res.error || "Upload failed");
-        setUploading(false);
+        setStatusText(null);
         return;
       }
 
       onChange(res.url);
-      setUploading(false);
-    } catch {
-      setError("Upload encountered a network error");
-      setUploading(false);
+      setStatusText(null);
+    } catch (err: any) {
+      console.error("[Upload Error]:", err);
+      setError("Failed to process and upload photo. Please try again.");
+      setStatusText(null);
     }
   };
 
@@ -86,7 +105,7 @@ export default function ImageUploader({
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-900 font-[family-name:var(--font-cinzel)]">
           {label}
         </label>
-        {value && !uploading && (
+        {value && !statusText && (
           <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" /> Photo Attached
           </span>
@@ -112,7 +131,7 @@ export default function ImageUploader({
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        onClick={() => !uploading && fileInputRef.current?.click()}
+        onClick={() => !statusText && fileInputRef.current?.click()}
         className={`relative w-full ${aspectClass} rounded-2xl border-2 border-dashed cursor-pointer overflow-hidden transition-all duration-300 flex flex-col items-center justify-center ${
           isDragging
             ? "border-[#8B1E41] bg-[#8B1E41]/5 scale-[1.01]"
@@ -122,18 +141,18 @@ export default function ImageUploader({
         }`}
       >
         <AnimatePresence>
-          {uploading && (
+          {statusText && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-[#2A0410]/85 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-4 text-center"
+              className="absolute inset-0 bg-[#2A0410]/90 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-4 text-center"
             >
               <Loader2 className="w-8 h-8 text-[#D4AF37] animate-spin mb-2" />
               <p className="text-xs font-bold text-[#FDFBF7] font-[family-name:var(--font-cinzel)] uppercase tracking-wider">
-                Uploading Photo...
+                {statusText}
               </p>
-              <p className="text-[10px] text-[#D4AF37] mt-1">Optimizing file size and resolution</p>
+              <p className="text-[10px] text-[#D4AF37] mt-1">Maintaining 100% studio fidelity</p>
             </motion.div>
           )}
         </AnimatePresence>
