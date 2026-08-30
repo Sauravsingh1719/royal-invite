@@ -7,11 +7,11 @@ export async function GET() {
   try {
     await dbConnect();
 
-    const existingUser = await User.findOne({ email: "admin@royalinvites.com" });
+    const existingUser = await User.findOne({ email: "sauravs160@gmail.com" });
     if (existingUser) {
       return NextResponse.json({
         message: "Admin already exists. You can log in directly.",
-        email: "admin@royalinvites.com",
+        email: "sauravs160@gmail.com",
         password: "Admin@123",
       });
     }
@@ -19,7 +19,7 @@ export async function GET() {
     const hashedPassword = await bcrypt.hash("Admin@123", 10);
     const user = new User({
       name: "Saurav Singh",
-      email: "admin@royalinvites.com",
+      email: "sauravs160@gmail.com",
       password: hashedPassword,
       role: "admin",
     });
@@ -30,7 +30,7 @@ export async function GET() {
       success: true,
       message: "Admin account created successfully!",
       credentials: {
-        email: "admin@royalinvites.com",
+        email: "sauravs160@gmail.com",
         password: "Admin@123",
       },
     });
