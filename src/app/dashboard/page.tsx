@@ -302,7 +302,7 @@ export default function Dashboard() {
                           title="Share on WhatsApp"
                         >
                           <Share2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Share</span>
+                          <span>Share Without Guest Details</span>
                         </button>
 
                         <Link
@@ -312,7 +312,7 @@ export default function Dashboard() {
                           title="Open Live Website"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>View</span>
+                          <span>View Without Guest Details</span>
                         </Link>
                       </div>
 
@@ -400,7 +400,7 @@ export default function Dashboard() {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. & Family"
+                      placeholder="Family or +1"
                       value={familyName}
                       onChange={(e) => setFamilyName(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none text-xs bg-white text-black font-semibold placeholder:text-gray-400"
@@ -427,7 +427,7 @@ export default function Dashboard() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Singh or Rai"
+                    placeholder="e.g. Family's Sir Name"
                     value={signOffFamily}
                     onChange={(e) => setSignOffFamily(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none text-xs bg-white text-black font-semibold placeholder:text-gray-400"
