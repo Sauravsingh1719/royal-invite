@@ -55,11 +55,16 @@ export async function POST(req: Request) {
 
     // Await email dispatch directly
     await transporter.sendMail({
-      from: EMAIL_FROM,
-      to: normalizedEmail,
-      subject: "Verify Your RoyalInvites Account",
-      html: getOtpTemplate(otp),
-    });
+  from: EMAIL_FROM,
+  to: user.email,
+  subject: `${otp} is your RoyalInvites verification code`,
+  text: `Your RoyalInvites verification code is: ${otp}\n\nThis code will expire in 5 minutes.\n\nIf you did not request this code, you can safely ignore this email.`,
+  html: getOtpTemplate(otp),
+  headers: {
+    "X-Priority": "1",
+    "Precedence": "bulk",
+  },
+});
 
     return NextResponse.json({
       success: true,

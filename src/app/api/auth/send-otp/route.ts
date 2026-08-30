@@ -36,11 +36,16 @@ export async function POST(req: Request) {
     await user.save();
 
     // 3. Await SMTP delivery before terminating the serverless lambda
-    await transporter.sendMail({
-      from: EMAIL_FROM,
-      to: user.email,
-      subject: "Your RoyalInvites Verification Code",
-      html: getOtpTemplate(otp),
+   await transporter.sendMail({
+  from: EMAIL_FROM,
+  to: user.email,
+  subject: `${otp} is your RoyalInvites verification code`,
+  text: `Your RoyalInvites verification code is: ${otp}\n\nThis code will expire in 5 minutes.\n\nIf you did not request this code, you can safely ignore this email.`,
+  html: getOtpTemplate(otp),
+  headers: {
+    "X-Priority": "1",
+    "Precedence": "bulk",
+  },
     });
 
     return NextResponse.json({
