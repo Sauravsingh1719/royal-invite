@@ -55,7 +55,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateDefinition> = {
     category: "Modern Luxe",
     badge: "Luxe Heritage",
     author: {
-      name: "Community Contributor",
+      name: "Saurav Singh",
       github: "https://github.com",
     },
     component: DesignThree,
@@ -67,7 +67,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateDefinition> = {
     category: "Modern Luxe",
     badge: "Floating Elements",
     author: {
-      name: "Community Contributor",
+      name: "Saurav Singh",
       github: "https://github.com",
     },
     component: DesignFour,

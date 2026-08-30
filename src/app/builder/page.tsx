@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight, Globe, Smile } from "lucide-react";
+import { Sparkles, ArrowRight, Globe, Smile, Eye, ExternalLink, Check } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
 import AudioSelector from "@/components/AudioSelector";
 import { getAllTemplates } from "@/templates/registry";
@@ -13,7 +13,6 @@ export default function BuilderPage() {
   const router = useRouter();
   const availableTemplates = getAllTemplates();
 
-  // Native NextAuth authentication gate with zero client-side race condition
   const { data: session, status } = useSession({
     required: true,
     onUnauthenticated() {
@@ -158,43 +157,73 @@ export default function BuilderPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Dynamic Template Selection Grid */}
+          {/* Dynamic Template Selection Grid with Live Preview Action */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-bold uppercase text-gray-900 font-[family-name:var(--font-cinzel)]">
                 Choose Experience Template ({availableTemplates.length} Available)
               </label>
+              <span className="text-[11px] text-gray-500 font-medium">
+                Click a card to select, or preview in a new tab
+              </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availableTemplates.map((template) => (
-                <button
-                  key={template.id}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, templateId: template.id })}
-                  className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between ${
-                    formData.templateId === template.id
-                      ? "border-[#8B1E41] bg-[#8B1E41]/5 shadow-sm ring-2 ring-[#8B1E41]/20"
-                      : "border-gray-300 hover:border-[#D4AF37] bg-white"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-bold text-sm text-[#8B1E41] font-[family-name:var(--font-cinzel)]">
-                        {template.name}
+              {availableTemplates.map((template) => {
+                const isSelected = formData.templateId === template.id;
+
+                return (
+                  <div
+                    key={template.id}
+                    onClick={() => setFormData({ ...formData, templateId: template.id })}
+                    className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer relative group ${
+                      isSelected
+                        ? "border-[#8B1E41] bg-[#8B1E41]/5 shadow-sm ring-2 ring-[#8B1E41]/20"
+                        : "border-gray-300 hover:border-[#D4AF37] bg-white"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-bold text-sm text-[#8B1E41] font-[family-name:var(--font-cinzel)]">
+                            {template.name}
+                          </p>
+                          {isSelected && (
+                            <span className="p-0.5 bg-[#8B1E41] text-[#D4AF37] rounded-full">
+                              <Check className="w-2.5 h-2.5" />
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-50 text-[#8B1E41] border border-[#D4AF37]/30 flex-shrink-0">
+                          {template.category}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-700 mt-1.5 font-medium leading-relaxed">
+                        {template.description}
                       </p>
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-50 text-[#8B1E41] border border-[#D4AF37]/30 flex-shrink-0">
-                        {template.category}
-                      </span>
                     </div>
-                    <p className="text-xs text-gray-700 mt-1.5 font-medium leading-relaxed">
-                      {template.description}
-                    </p>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <p className="text-[10px] text-gray-400 font-mono">
+                        By {template.author.name}
+                      </p>
+
+                      {/* Dedicated Preview Button Opening in New Tab */}
+                      <a
+                        href={`/templates?preview=${template.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B1E41] hover:text-[#5C1027] bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 px-2.5 py-1 rounded-lg transition-all border border-[#8B1E41]/20 shadow-2xs"
+                        title={`Preview ${template.name} in a new tab`}
+                      >
+                        <Eye className="w-3 h-3" />
+                        <span>Preview</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                      </a>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-gray-400 mt-3 font-mono">
-                    By {template.author.name}
-                  </p>
-                </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 

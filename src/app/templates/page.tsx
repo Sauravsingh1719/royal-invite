@@ -6,13 +6,16 @@ import { ArrowRight, Info, Loader2 } from "lucide-react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getAllTemplates, getTemplate } from "@/templates/registry";
 import { sampleDesignOneWedding } from "@/lib/sample-wedding";
+import { useSearchParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function TemplatesShowcasePage() {
+  const searchParams = useSearchParams();
+  const previewParam = searchParams.get("preview");
   const templates = getAllTemplates();
-  const [activeTemplateId, setActiveTemplateId] = useState<string>(
-    templates[0]?.id || "design-one"
+  const [activeTemplateId, setActiveTemplateId] = useState(
+    previewParam || templates[0]?.id
   );
   const [mounted, setMounted] = useState(false);
 
