@@ -23,20 +23,36 @@ export const viewport: Viewport = {
   themeColor: "#8B1E41",
 };
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.NEXTAUTH_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "https://royalinvitess.vercel.app");
+
 // Comprehensive SEO & Open Graph Metadata
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.com"
-  ),
+  metadataBase: new URL(siteUrl),
+
   title: {
     default: "Royal Digital Wedding Invitations | Personalized E-Invites",
     template: "%s | Royal Wedding Invitations",
   },
+
   description:
     "Create luxury, interactive digital wedding invitations with personalized guest greetings, 3D animated cards, seamless event details, and RSVP tracking.",
+
   applicationName: "Royal Wedding Invitations",
-  authors: [{ name: "Saurav Singh", url: "https://saurav190.vercel.app" }],
+
+  authors: [
+    {
+      name: "Saurav Singh",
+      url: "https://saurav190.vercel.app",
+    },
+  ],
+
   generator: "Next.js",
+
   keywords: [
     "digital wedding invitation",
     "online wedding card",
@@ -47,44 +63,62 @@ export const metadata: Metadata = {
     "save the date e-invite",
     "wedding RSVP tracker",
   ],
+
   creator: "Saurav Singh",
   publisher: "Royal Wedding Invitations",
+
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
+
   alternates: {
     canonical: "/",
   },
+
+  // Open Graph
   openGraph: {
     title: "Royal Digital Wedding Invitations | Interactive E-Invites",
+
     description:
       "Craft bespoke, animated wedding invitations with dynamic guest notes, interactive 3D frames, and seamless event directions.",
+
     url: "/",
     siteName: "Royal Wedding Invitations",
+
     images: [
       {
-        url: "/og-image.jpg", // Place an appealing 1200x630 preview image in your public folder
+        url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "Luxury Digital Wedding Invitation Platform Preview",
+        alt: "Royal Wedding Invitations Logo",
       },
     ],
+
     locale: "en_US",
     type: "website",
   },
+
+  // Twitter / X
   twitter: {
     card: "summary_large_image",
+
     title: "Royal Digital Wedding Invitations | Interactive E-Invites",
+
     description:
       "Craft bespoke, animated wedding invitations with dynamic guest notes, interactive 3D frames, and seamless event directions.",
-    images: ["/og-image.jpg"],
+
+    images: ["/logo.png"],
+
     creator: "@yourhandle",
   },
+
+  // Search engine robots
   robots: {
     index: true,
     follow: true,
+
     googleBot: {
       index: true,
       follow: true,
@@ -93,10 +127,12 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+
+  // Browser favicon / icons
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
