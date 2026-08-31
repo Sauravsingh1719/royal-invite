@@ -16,15 +16,29 @@ import {
   CalendarHeart, 
   Sparkles, 
   Flower2,
-  Leaf
+  Leaf,
+  Clock,
+  Calendar,
+  ExternalLink
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { decodeGuestPayload } from "@/lib/guest-utils";
 
 /* ─── Types ─── */
 
+export interface IWeddingFunctionItem {
+  _id?: string;
+  title: string;
+  dateText: string;
+  timeText: string;
+  venueTitle: string;
+  venueAddress: string;
+  googleMapsUrl?: string;
+}
+
 interface DesignFourProps {
   wedding: {
+    displayOrder?: "bride_first" | "groom_first";
     bride: { name: string; parents: string; image: string; traits?: string[] };
     groom: { name: string; parents: string; image: string; traits?: string[] };
     couple: { quote?: string; image?: string };
@@ -35,6 +49,7 @@ interface DesignFourProps {
       venueAddress: string;
       googleMapsUrl: string;
     };
+    functions?: IWeddingFunctionItem[];
     defaultFamilySignOff: string;
   };
 }
@@ -128,7 +143,7 @@ const CameoFrame = ({
         src={src}
         alt={alt}
         fill
-        className="object-cover"
+        className="object-cover object-top"
         sizes="(max-width: 768px) 250px, 300px"
       />
     </div>
@@ -225,10 +240,10 @@ const PersonalNote = () => {
         </p>
         
         {payload.n && (
-          <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl md:text-5xl text-[#8B1F3C] mb-4">
-            Dear {payload.n},
-          </h2>
-        )}
+  <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl md:text-5xl text-[#8B1F3C] mb-4">
+    Dear {payload.n} {payload.fn ? `& ${payload.fn}` : (payload as any).s ? (payload as any).s : ""},
+  </h2>
+)}
         
         <p className="font-[family-name:var(--font-cormorant)] italic text-xl md:text-2xl text-[#5c4a3d] leading-relaxed">
           &ldquo;{payload.m}&rdquo;
@@ -266,22 +281,6 @@ const FooterBlessings = ({ defaultFam }: { defaultFam: string }) => {
       <span className="font-[family-name:var(--font-great-vibes)] text-[#8B1F3C] text-4xl md:text-5xl block mb-12">
         The {familyName} Family
       </span>
-
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex items-center gap-2">
-          <div className="h-px w-6 bg-[#D4AF37]/40" />
-          <Flower2 className="w-3 h-3 text-[#D4AF37]/60" />
-          <div className="h-px w-6 bg-[#D4AF37]/40" />
-        </div>
-        <a
-          href="https://saurav190.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-[family-name:var(--font-cinzel)] text-[#D4AF37]/70 hover:text-[#8B1F3C] text-[10px] uppercase tracking-[0.25em] transition-colors"
-        >
-          Crafted by Saurav Singh
-        </a>
-      </div>
     </section>
   );
 };
@@ -291,6 +290,8 @@ const FooterBlessings = ({ defaultFam }: { defaultFam: string }) => {
 export default function DesignFour({ wedding }: DesignFourProps) {
   const containerRef = useRef<HTMLElement>(null);
   const [startEntrance, setStartEntrance] = useState(false);
+
+  const isGroomFirst = wedding.displayOrder === "groom_first";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -318,6 +319,79 @@ export default function DesignFour({ wedding }: DesignFourProps) {
     mouseY.set(e.clientY);
   };
 
+  // Profile Cameo Blocks
+  const renderBrideCameo = (delay = 0.2) => (
+    <div className="flex-1 flex flex-col items-center text-center w-full max-w-xs">
+      <CameoFrame 
+        src={wedding.bride.image} 
+        alt={wedding.bride.name} 
+        delay={delay}
+        borderColor="#D4AF37"
+      />
+      
+      <div className="mt-6 space-y-1">
+        <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.25em] font-bold">
+          The Bride
+        </p>
+        <h3 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl text-[#8B1F3C]">
+          {wedding.bride.name}
+        </h3>
+        <p className="font-[family-name:var(--font-cormorant)] text-[#5c4a3d] italic text-base font-semibold">
+          {wedding.bride.parents}
+        </p>
+      </div>
+
+      {wedding.bride.traits && (
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {wedding.bride.traits.map((trait, idx) => (
+            <span
+              key={idx}
+              className="bg-white/80 border border-[#D4AF37]/30 rounded-full px-3.5 py-1 font-[family-name:var(--font-cormorant)] italic text-[#8B1F3C] text-xs shadow-sm"
+            >
+              {trait}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderGroomCameo = (delay = 0.3) => (
+    <div className="flex-1 flex flex-col items-center text-center w-full max-w-xs">
+      <CameoFrame 
+        src={wedding.groom.image} 
+        alt={wedding.groom.name} 
+        delay={delay}
+        borderColor="#8B1F3C"
+      />
+      
+      <div className="mt-6 space-y-1">
+        <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.25em] font-bold">
+          The Groom
+        </p>
+        <h3 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl text-[#8B1F3C]">
+          {wedding.groom.name}
+        </h3>
+        <p className="font-[family-name:var(--font-cormorant)] text-[#5c4a3d] italic text-base font-semibold">
+          {wedding.groom.parents}
+        </p>
+      </div>
+
+      {wedding.groom.traits && (
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {wedding.groom.traits.map((trait, idx) => (
+            <span
+              key={idx}
+              className="bg-white/80 border border-[#8B1F3C]/30 rounded-full px-3.5 py-1 font-[family-name:var(--font-cormorant)] italic text-[#8B1F3C] text-xs shadow-sm"
+            >
+              {trait}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <main 
       ref={containerRef} 
@@ -333,31 +407,24 @@ export default function DesignFour({ wedding }: DesignFourProps) {
         style={{ opacity: heroOpacity }}
       >
         <motion.div
-          initial={{ opacity: 0, y: -15 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={startEntrance ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center gap-2 mb-4"
+          className="flex flex-col items-center gap-3 mb-6"
         >
-          <motion.div
-  initial={{ opacity: 0, y: -20 }}
-  animate={startEntrance ? { opacity: 1, y: 0 } : {}}
-  transition={{ duration: 0.8 }}
-  className="flex flex-col items-center gap-3 mb-6"
->
-  <div className="relative w-22 h-22 md:w-20 md:h-20">
-    <Image
-      src="/ganesha.svg"
-      alt="Lord Ganesha Blessing"
-      fill
-      priority
-      className="object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
-    />
-  </div>
-  
-  <span className="font-[family-name:var(--font-cinzel)] text-[#8B1E41] tracking-[0.45em] uppercase text-xs md:text-sm font-bold">
-    || Shree Ganeshayah Namah ||
-  </span>
-</motion.div>
+          <div className="relative w-22 h-22 md:w-20 md:h-20">
+            <Image
+              src="/ganesha.svg"
+              alt="Lord Ganesha Blessing"
+              fill
+              priority
+              className="object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
+            />
+          </div>
+          
+          <span className="font-[family-name:var(--font-cinzel)] text-[#8B1E41] tracking-[0.45em] uppercase text-xs md:text-sm font-bold">
+            || Shree Ganeshayah Namah ||
+          </span>
         </motion.div>
 
         <motion.h1 
@@ -366,14 +433,26 @@ export default function DesignFour({ wedding }: DesignFourProps) {
           animate={startEntrance ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          {wedding.bride.name} 
-          <span className="text-[#D4AF37] font-[family-name:var(--font-great-vibes)] font-normal text-5xl sm:text-7xl md:text-8xl mx-3">
-            &amp;
-          </span> 
-          {wedding.groom.name}
+          {isGroomFirst ? (
+            <>
+              {wedding.groom.name} 
+              <span className="text-[#D4AF37] font-[family-name:var(--font-great-vibes)] font-normal text-5xl sm:text-7xl md:text-8xl mx-3">
+                &amp;
+              </span> 
+              {wedding.bride.name}
+            </>
+          ) : (
+            <>
+              {wedding.bride.name} 
+              <span className="text-[#D4AF37] font-[family-name:var(--font-great-vibes)] font-normal text-5xl sm:text-7xl md:text-8xl mx-3">
+                &amp;
+              </span> 
+              {wedding.groom.name}
+            </>
+          )}
         </motion.h1>
 
-        {/* Framed Couple Portrait (Avoids Full-Page Pixelation) */}
+        {/* Framed Couple Portrait */}
         {wedding.couple.image && (
           <motion.div 
             className="relative mx-auto my-6 w-52 h-64 sm:w-60 sm:h-72 md:w-64 md:h-80 rounded-t-[100px] rounded-b-2xl overflow-hidden border-2 border-[#D4AF37]/50 shadow-2xl"
@@ -422,93 +501,40 @@ export default function DesignFour({ wedding }: DesignFourProps) {
         <PersonalNote />
       </Suspense>
 
-      {/* ─── THE COUPLE SECTION (PERFECTLY ALIGNED) ─── */}
+      {/* ─── THE COUPLE SECTION ─── */}
       <section className="relative z-30 px-6 py-14 max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] uppercase tracking-[0.3em] text-[11px] font-bold mb-2">
             Introducing
           </p>
           <h2 className="font-[family-name:var(--font-cinzel)] text-3xl sm:text-4xl md:text-5xl font-bold text-[#8B1F3C]">
-            The <span className="text-[#2D5A4A]">Bride</span> &amp; <span className="text-[#2D5A4A]">Groom</span>
+            {isGroomFirst ? (
+              <>
+                The <span className="text-[#2D5A4A]">Groom</span> &amp; <span className="text-[#2D5A4A]">Bride</span>
+              </>
+            ) : (
+              <>
+                The <span className="text-[#2D5A4A]">Bride</span> &amp; <span className="text-[#2D5A4A]">Groom</span>
+              </>
+            )}
           </h2>
         </div>
 
-        {/* 3-Part Flexbox Container: Bride | Thread | Groom */}
+        {/* 3-Part Flexbox Container based on display order */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-8">
-          
-          {/* Bride Column */}
-          <div className="flex-1 flex flex-col items-center text-center w-full max-w-xs">
-            <CameoFrame 
-              src={wedding.bride.image} 
-              alt={wedding.bride.name} 
-              delay={0.2}
-              borderColor="#D4AF37"
-            />
-            
-            <div className="mt-6 space-y-1">
-              <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.25em] font-bold">
-                The Bride
-              </p>
-              <h3 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl text-[#8B1F3C]">
-                {wedding.bride.name}
-              </h3>
-              <p className="font-[family-name:var(--font-cormorant)] text-[#5c4a3d] italic text-base">
-                {wedding.bride.parents}
-              </p>
-            </div>
-
-            {wedding.bride.traits && (
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {wedding.bride.traits.map((trait, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-white/80 border border-[#D4AF37]/30 rounded-full px-3.5 py-1 font-[family-name:var(--font-cormorant)] italic text-[#8B1F3C] text-xs shadow-sm"
-                  >
-                    {trait}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Desktop Center Connector */}
-          <SacredThread />
-
-          {/* Groom Column */}
-          <div className="flex-1 flex flex-col items-center text-center w-full max-w-xs">
-            <CameoFrame 
-              src={wedding.groom.image} 
-              alt={wedding.groom.name} 
-              delay={0.3}
-              borderColor="#8B1F3C"
-            />
-            
-            <div className="mt-6 space-y-1">
-              <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.25em] font-bold">
-                The Groom
-              </p>
-              <h3 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl text-[#8B1F3C]">
-                {wedding.groom.name}
-              </h3>
-              <p className="font-[family-name:var(--font-cormorant)] text-[#5c4a3d] italic text-base">
-                {wedding.groom.parents}
-              </p>
-            </div>
-
-            {wedding.groom.traits && (
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {wedding.groom.traits.map((trait, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-white/80 border border-[#8B1F3C]/30 rounded-full px-3.5 py-1 font-[family-name:var(--font-cormorant)] italic text-[#8B1F3C] text-xs shadow-sm"
-                  >
-                    {trait}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
+          {isGroomFirst ? (
+            <>
+              {renderGroomCameo(0.2)}
+              <SacredThread />
+              {renderBrideCameo(0.3)}
+            </>
+          ) : (
+            <>
+              {renderBrideCameo(0.2)}
+              <SacredThread />
+              {renderGroomCameo(0.3)}
+            </>
+          )}
         </div>
       </section>
 
@@ -533,7 +559,7 @@ export default function DesignFour({ wedding }: DesignFourProps) {
               Save the Date
             </p>
             <h2 className="font-[family-name:var(--font-cinzel)] text-3xl sm:text-4xl font-bold text-[#8B1F3C]">
-              The Celebration
+              The Wedding Celebration
             </h2>
           </div>
 
@@ -604,6 +630,85 @@ export default function DesignFour({ wedding }: DesignFourProps) {
           </div>
         </div>
       </section>
+
+      {/* ─── SACRED RITUALS & CEREMONIES SCHEDULE ─── */}
+      {wedding.functions && wedding.functions.length > 0 && (
+        <>
+          <FiligreeDivider />
+
+          <section className="relative z-30 py-16 px-6 max-w-6xl mx-auto w-full">
+            <div className="text-center mb-12 space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-[#8B1F3C]/10 border border-[#8B1F3C]/25 rounded-full text-[#8B1F3C] text-xs font-bold font-[family-name:var(--font-cinzel)] uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" /> Ceremonial Schedule
+              </div>
+              <h2 className="font-[family-name:var(--font-cinzel)] text-3xl sm:text-4xl md:text-5xl font-bold text-[#8B1F3C]">
+                Wedding <span className="text-[#2D5A4A]">Rituals & Functions</span>
+              </h2>
+              <p className="font-[family-name:var(--font-cormorant)] italic text-lg sm:text-xl text-[#5c4a3d] max-w-xl mx-auto">
+                Join us in celebrating every sacred ceremony and traditional milestone.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {wedding.functions.map((fn, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.6, delay: idx * 0.1 }}
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-[#D4AF37]/30 shadow-md flex flex-col justify-between hover:border-[#8B1F3C]/50 transition-all group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between border-b border-[#D4AF37]/25 pb-3 mb-4">
+                      <h3 className="font-[family-name:var(--font-cinzel)] font-bold text-lg text-[#8B1F3C]">
+                        {fn.title}
+                      </h3>
+                      <span className="w-7 h-7 rounded-full bg-[#8B1F3C]/10 text-[#8B1F3C] border border-[#8B1F3C]/20 text-xs font-bold flex items-center justify-center font-mono">
+                        0{idx + 1}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3 font-[family-name:var(--font-cormorant)] text-[#5c4a3d] text-base">
+                      <div className="flex items-start gap-2.5">
+                        <Calendar className="w-4 h-4 text-[#D4AF37] mt-1 flex-shrink-0" />
+                        <span className="text-[#2a0410] font-bold">{fn.dateText}</span>
+                      </div>
+
+                      <div className="flex items-start gap-2.5">
+                        <Clock className="w-4 h-4 text-[#D4AF37] mt-1 flex-shrink-0" />
+                        <span>{fn.timeText}</span>
+                      </div>
+
+                      <div className="flex items-start gap-2.5">
+                        <MapPin className="w-4 h-4 text-[#2D5A4A] mt-1 flex-shrink-0" />
+                        <div className="leading-snug">
+                          <p className="font-semibold text-[#2a0410]">{fn.venueTitle}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{fn.venueAddress}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {fn.googleMapsUrl && (
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                      <a
+                        href={fn.googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 bg-[#8B1F3C]/10 hover:bg-[#8B1F3C] text-[#8B1F3C] hover:text-[#FBF9F5] rounded-xl text-xs font-bold font-[family-name:var(--font-cinzel)] uppercase tracking-wider transition-all border border-[#8B1F3C]/20 shadow-2xs"
+                      >
+                        <span>Directions</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
 
       {/* ─── FOOTER ─── */}
       <Suspense fallback={null}>

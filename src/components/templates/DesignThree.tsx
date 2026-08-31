@@ -15,18 +15,31 @@ import {
   MapPin, 
   Clock, 
   CalendarHeart, 
-  Sparkles, 
   Crown, 
   Flower2,
-  ScrollText
+  ScrollText,
+  Calendar,
+  Sparkles,
+  ExternalLink
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { decodeGuestPayload } from "@/lib/guest-utils";
 
 /* ─── Types ─── */
 
+export interface IWeddingFunctionItem {
+  _id?: string;
+  title: string;
+  dateText: string;
+  timeText: string;
+  venueTitle: string;
+  venueAddress: string;
+  googleMapsUrl?: string;
+}
+
 interface DesignThreeProps {
   wedding: {
+    displayOrder?: "bride_first" | "groom_first";
     bride: { name: string; parents: string; image: string; traits?: string[] };
     groom: { name: string; parents: string; image: string; traits?: string[] };
     couple: { quote?: string; image?: string };
@@ -37,6 +50,7 @@ interface DesignThreeProps {
       venueAddress: string;
       googleMapsUrl: string;
     };
+    functions?: IWeddingFunctionItem[];
     defaultFamilySignOff: string;
   };
 }
@@ -97,7 +111,7 @@ const FloatingDiyas = () => {
               cx="12" 
               cy="6" 
               r="3" 
-              fill="#D4AF37"
+              fill="#D4AF37" 
               animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
@@ -291,7 +305,7 @@ const PersonalNote = () => {
           
           {payload.n && (
             <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl md:text-5xl text-[#8B1E41] mb-6">
-              Dear {payload.n},
+              Dear {payload.n} {payload.fn ? `& ${payload.fn}` : (payload as any).s ? (payload as any).s : ""},
             </h2>
           )}
           
@@ -329,21 +343,7 @@ const FooterBlessings = ({ defaultFam }: { defaultFam: string }) => {
         The {familyName} Family
       </span>
 
-      <div className="mt-14 relative z-10 flex flex-col items-center gap-2">
-        <div className="flex items-center justify-center gap-3 mb-1">
-          <div className="h-px w-8 bg-[#D4AF37]/40" />
-          <Crown className="w-4 h-4 text-[#D4AF37]/60" />
-          <div className="h-px w-8 bg-[#D4AF37]/40" />
-        </div>
-        <a
-          href="https://saurav190.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-[family-name:var(--font-cinzel)] text-[#D4AF37]/60 hover:text-[#8B1E41] text-[10px] uppercase tracking-[0.3em] transition-colors"
-        >
-          Crafted by Saurav Singh
-        </a>
-      </div>
+      
     </section>
   );
 };
@@ -353,6 +353,8 @@ const FooterBlessings = ({ defaultFam }: { defaultFam: string }) => {
 export default function DesignThree({ wedding }: DesignThreeProps) {
   const containerRef = useRef<HTMLElement>(null);
   const [startEntrance, setStartEntrance] = useState(false);
+
+  const isGroomFirst = wedding.displayOrder === "groom_first";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -369,7 +371,6 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
-  // Extended visibility range so Bride & Groom remain completely clear and only disappear naturally when scrolled past
   const heroY = useTransform(smoothProgress, [0, 0.25], ["0%", "18%"]);
   const heroOpacity = useTransform(smoothProgress, [0.08, 0.26], [1, 0]);
   const heroScale = useTransform(smoothProgress, [0.08, 0.26], [1, 0.92]);
@@ -384,10 +385,16 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
     mouseY.set(e.clientY);
   };
 
-  const coupleProfiles = [
-    { ...wedding.bride, role: "The Bride", icon: Flower2, dir: "left" as const, delay: 0.1 },
-    { ...wedding.groom, role: "The Groom", icon: Crown, dir: "right" as const, delay: 0.2 }
-  ];
+  const brideProfileData = { ...wedding.bride, role: "The Bride", icon: Flower2, dir: (isGroomFirst ? "right" : "left") as const, delay: isGroomFirst ? 0.2 : 0.1 };
+  const groomProfileData = { ...wedding.groom, role: "The Groom", icon: Crown, dir: (isGroomFirst ? "left" : "right") as const, delay: isGroomFirst ? 0.1 : 0.2 };
+  
+  const coupleProfiles = isGroomFirst ? [groomProfileData, brideProfileData] : [brideProfileData, groomProfileData];
+
+  // First & Second person for triptych hero
+  const firstPerson = isGroomFirst ? wedding.groom : wedding.bride;
+  const firstRole = isGroomFirst ? "The Groom" : "The Bride";
+  const secondPerson = isGroomFirst ? wedding.bride : wedding.groom;
+  const secondRole = isGroomFirst ? "The Bride" : "The Groom";
 
   return (
     <main 
@@ -412,15 +419,15 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-8"
         >
-          <div className="relative w-30 h-50 md:w-40 md:h-40">
-    <Image
-      src="/ganesha.svg"
-      alt="Lord Ganesha Blessing"
-      fill
-      priority
-      className="object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
-    />
-  </div>
+          <div className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-3">
+            <Image
+              src="/ganesha.svg"
+              alt="Lord Ganesha Blessing"
+              fill
+              priority
+              className="object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
+            />
+          </div>
           <WordFade
             delay={0.2}
             text="Shree Ganeshay Namah"
@@ -431,20 +438,20 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
         {/* Triptych Grid */}
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 items-center justify-items-center">
           
-          {/* Bride (Left) */}
+          {/* First Profile (Left) */}
           <RoyalFrame delay={0.4} className="w-full max-w-[300px] lg:max-w-[280px] order-2 lg:order-1">
             <div className="relative aspect-[3/4] overflow-hidden bg-[#1a0a10]">
               <Image
-                src={wedding.bride.image}
-                alt={wedding.bride.name}
+                src={firstPerson.image}
+                alt={firstPerson.name}
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 300px, 280px"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-85" />
               <div className="absolute bottom-0 left-0 right-0 p-5 text-center">
-                <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-1">The Bride</p>
-                <h3 className="font-[family-name:var(--font-great-vibes)] text-3xl md:text-4xl text-[#FDFBF7]">{wedding.bride.name}</h3>
+                <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-1">{firstRole}</p>
+                <h3 className="font-[family-name:var(--font-great-vibes)] text-3xl md:text-4xl text-[#FDFBF7]">{firstPerson.name}</h3>
               </div>
             </div>
           </RoyalFrame>
@@ -477,7 +484,15 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
 
               <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
                 <p className="font-[family-name:var(--font-great-vibes)] text-3xl md:text-4xl text-[#D4AF37]">
-                  {wedding.bride.name} <span className="text-[#8B1E41] mx-1">&amp;</span> {wedding.groom.name}
+                  {isGroomFirst ? (
+                    <>
+                      {wedding.groom.name} <span className="text-[#8B1E41] mx-1">&amp;</span> {wedding.bride.name}
+                    </>
+                  ) : (
+                    <>
+                      {wedding.bride.name} <span className="text-[#8B1E41] mx-1">&amp;</span> {wedding.groom.name}
+                    </>
+                  )}
                 </p>
                 <p className="font-[family-name:var(--font-cinzel)] text-[9px] text-[#D4AF37]/75 uppercase tracking-[0.35em] mt-1.5">
                   Request the honor of your presence
@@ -486,20 +501,20 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
             </div>
           </RoyalFrame>
 
-          {/* Groom (Right) */}
+          {/* Second Profile (Right) */}
           <RoyalFrame delay={0.4} className="w-full max-w-[300px] lg:max-w-[280px] order-3">
             <div className="relative aspect-[3/4] overflow-hidden bg-[#1a0a10]">
               <Image
-                src={wedding.groom.image}
-                alt={wedding.groom.name}
+                src={secondPerson.image}
+                alt={secondPerson.name}
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 300px, 280px"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-85" />
               <div className="absolute bottom-0 left-0 right-0 p-5 text-center">
-                <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-1">The Groom</p>
-                <h3 className="font-[family-name:var(--font-great-vibes)] text-3xl md:text-4xl text-[#FDFBF7]">{wedding.groom.name}</h3>
+                <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-1">{secondRole}</p>
+                <h3 className="font-[family-name:var(--font-great-vibes)] text-3xl md:text-4xl text-[#FDFBF7]">{secondPerson.name}</h3>
               </div>
             </div>
           </RoyalFrame>
@@ -544,12 +559,12 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
                       <IconComponent className="w-6 h-6 text-[#D4AF37]" />
                     </div>
                     <div>
-                      <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.3em]">Introducing</p>
+                      <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.3em]">{person.role}</p>
                       <h3 className="font-[family-name:var(--font-great-vibes)] text-3xl sm:text-4xl text-[#FDFBF7]">{person.name}</h3>
                     </div>
                   </div>
                   
-                  <p className="font-[family-name:var(--font-cormorant)] text-gray-400 italic text-base sm:text-lg mb-5">
+                  <p className="font-[family-name:var(--font-cormorant)] text-gray-400 italic text-base sm:text-lg mb-5 font-semibold">
                     {person.parents}
                   </p>
 
@@ -574,7 +589,7 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
         <PersonalNote />
       </Suspense>
 
-      {/* ─── EVENT DETAILS ─── */}
+      {/* ─── MAIN EVENT DETAILS ─── */}
       <section className="min-h-[70vh] flex items-center justify-center relative z-30 px-6 py-16">
         <motion.div 
           className="max-w-4xl w-full bg-gradient-to-br from-[#1a0a10] to-[#0f050a] border border-[#D4AF37]/30 rounded-3xl p-8 md:p-14 relative overflow-hidden shadow-2xl"
@@ -586,7 +601,7 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
           <div className="text-center mb-10">
             <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] text-[10px] uppercase tracking-[0.35em] mb-2">Save the Date</p>
             <h2 className="font-[family-name:var(--font-cinzel)] text-3xl md:text-4xl font-bold text-[#FDFBF7]">
-              The <span className="text-[#D4AF37]">Celebration</span>
+              The Main <span className="text-[#D4AF37]">Wedding Ceremony</span>
             </h2>
           </div>
 
@@ -626,6 +641,81 @@ export default function DesignThree({ wedding }: DesignThreeProps) {
           </div>
         </motion.div>
       </section>
+
+      {/* ─── MULTI-RITUALS & CEREMONIES SCHEDULE ─── */}
+      {wedding.functions && wedding.functions.length > 0 && (
+        <section className="relative z-30 px-6 py-16 max-w-6xl mx-auto w-full">
+          <div className="text-center mb-12 space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full text-[#D4AF37] text-xs font-bold font-[family-name:var(--font-cinzel)] uppercase">
+              <Sparkles className="w-3.5 h-3.5" /> Ceremonial Itinerary
+            </div>
+            <h2 className="font-[family-name:var(--font-cinzel)] text-3xl md:text-5xl font-bold text-[#FDFBF7]">
+              Sacred <span className="text-[#D4AF37]">Rituals & Functions</span>
+            </h2>
+            <p className="font-[family-name:var(--font-cormorant)] italic text-lg md:text-xl text-gray-400 max-w-xl mx-auto">
+              Join us in celebrating every sacred milestone leading to our union.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {wedding.functions.map((fn, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                className="bg-gradient-to-br from-[#1a0a10] to-[#0f050a] border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#D4AF37]/60 transition-all duration-300 shadow-xl relative group"
+              >
+                <div>
+                  <div className="flex items-center justify-between border-b border-[#D4AF37]/20 pb-3 mb-4">
+                    <h3 className="font-[family-name:var(--font-cinzel)] font-bold text-lg text-[#FDFBF7]">
+                      {fn.title}
+                    </h3>
+                    <span className="w-7 h-7 rounded-full bg-[#8B1E41]/50 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-bold flex items-center justify-center font-mono">
+                      0{idx + 1}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 font-[family-name:var(--font-cormorant)] text-gray-300 text-base">
+                    <div className="flex items-start gap-2.5">
+                      <Calendar className="w-4 h-4 text-[#D4AF37] mt-1 flex-shrink-0" />
+                      <span className="text-[#FDFBF7] font-semibold">{fn.dateText}</span>
+                    </div>
+
+                    <div className="flex items-start gap-2.5">
+                      <Clock className="w-4 h-4 text-[#D4AF37] mt-1 flex-shrink-0" />
+                      <span>{fn.timeText}</span>
+                    </div>
+
+                    <div className="flex items-start gap-2.5">
+                      <MapPin className="w-4 h-4 text-[#D4AF37] mt-1 flex-shrink-0" />
+                      <div className="leading-snug">
+                        <p className="text-[#FDFBF7] font-medium">{fn.venueTitle}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{fn.venueAddress}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {fn.googleMapsUrl && (
+                  <div className="mt-6 pt-4 border-t border-white/5">
+                    <a
+                      href={fn.googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 bg-[#8B1E41]/30 hover:bg-[#8B1E41] text-[#D4AF37] hover:text-white rounded-xl text-xs font-bold font-[family-name:var(--font-cinzel)] uppercase tracking-wider transition-all border border-[#D4AF37]/20 shadow-sm"
+                    >
+                      <span>Directions</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <Suspense fallback={null}>
         <FooterBlessings defaultFam={wedding.defaultFamilySignOff} />

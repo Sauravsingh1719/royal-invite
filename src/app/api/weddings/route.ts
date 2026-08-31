@@ -18,7 +18,10 @@ export async function GET() {
     return NextResponse.json(weddings, { status: 200 });
   } catch (error) {
     console.error("Failed to fetch weddings:", error);
-    return NextResponse.json({ message: "Error fetching invitations" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error fetching invitations" },
+      { status: 500 }
+    );
   }
 }
 
@@ -33,22 +36,46 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     const userId = (session.user as any).id;
+    const normalizedSlug = data.slug.toLowerCase().trim();
 
-    const existing = await Wedding.findOne({ slug: data.slug.toLowerCase().trim() });
+    const existing = await Wedding.findOne({ slug: normalizedSlug });
     if (existing) {
-      return NextResponse.json({ message: "This URL slug is already taken" }, { status: 409 });
+      return NextResponse.json(
+        { message: "This URL slug is already taken. Please choose a different link." },
+        { status: 409 }
+      );
     }
+
+    // Sanitize and structure ritual functions array
+    const sanitizedFunctions = Array.isArray(data.functions)
+      ? data.functions.map((fn: any) => ({
+          title: fn.title?.trim() || "Ceremony",
+          dateText: fn.dateText?.trim() || "",
+          timeText: fn.timeText?.trim() || "",
+          venueTitle: fn.venueTitle?.trim() || "",
+          venueAddress: fn.venueAddress?.trim() || "",
+          googleMapsUrl: fn.googleMapsUrl?.trim() || "",
+        }))
+      : [];
 
     const newWedding = new Wedding({
       ...data,
       userId,
-      slug: data.slug.toLowerCase().trim(),
+      slug: normalizedSlug,
+      displayOrder: data.displayOrder === "groom_first" ? "groom_first" : "bride_first",
+      functions: sanitizedFunctions,
     });
 
     await newWedding.save();
-    return NextResponse.json({ message: "Wedding invitation created", wedding: newWedding }, { status: 201 });
+    return NextResponse.json(
+      { message: "Wedding invitation created", wedding: newWedding },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error("Error creating wedding:", error);
-    return NextResponse.json({ message: error.message || "Failed to create invitation" }, { status: 500 });
+    return NextResponse.json(
+      { message: error.message || "Failed to create invitation" },
+      { status: 500 }
+    );
   }
 }

@@ -156,9 +156,47 @@ export default function Dashboard() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const shareOnWhatsApp = (url: string, guestText: string) => {
+  // 1. WhatsApp Share for Master Website Link (No Guest Details)
+  const shareMasterLink = (wedding: any) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const fullUrl = `${origin}/${wedding.slug}`;
+    const coupleNames = wedding.displayOrder === "groom_first"
+      ? `${wedding.groom.name} & ${wedding.bride.name}`
+      : `${wedding.bride.name} & ${wedding.groom.name}`;
+
     const text = encodeURIComponent(
-      `Dear ${guestText},\n\nYou are cordially invited to celebrate our wedding!\n\nOpen your personal royal invitation here: ${url}`
+      `*Dear Family & Friends,*\n\n` +
+      `We cordially invite you to celebrate the wedding of\n` +
+      `*${coupleNames}* 💍✨\n\n` +
+      `📅 *Date:* ${wedding.event?.dateText || ""}\n` +
+      `⏰ *Time:* ${wedding.event?.timeText || ""}\n` +
+      `📍 *Venue:* ${wedding.event?.venueTitle || ""}\n\n` +
+      `Please open our royal wedding invitation here:\n` +
+      `🔗 ${fullUrl}\n\n` +
+      `Warm Regards,\n` +
+      `— *The ${wedding.defaultFamilySignOff || "Royal"} Family*`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+  };
+
+  // 2. WhatsApp Share for Personalized Guest Link
+  const shareGuestLink = (wedding: any, guest: any) => {
+    const guestDisplayName = `${guest.name} ${guest.familySuffix ? `& ${guest.familySuffix}` : ""}`.trim();
+    const coupleNames = wedding.displayOrder === "groom_first"
+      ? `${wedding.groom.name} & ${wedding.bride.name}`
+      : `${wedding.bride.name} & ${wedding.groom.name}`;
+    const signOff = guest.famSignOff || wedding.defaultFamilySignOff || "Royal";
+
+    const text = encodeURIComponent(
+      `*Dear ${guestDisplayName},*\n\n` +
+      `You are cordially invited to celebrate the wedding of\n` +
+      `*${coupleNames}* 💍✨\n\n` +
+      `📅 *Date:* ${wedding.event?.dateText || ""}\n` +
+      `📍 *Venue:* ${wedding.event?.venueTitle || ""}\n\n` +
+      `Please open your personalized royal invitation here:\n` +
+      `🔗 ${guest.url}\n\n` +
+      `Warm Regards,\n` +
+      `— *The ${signOff} Family*`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
   };
@@ -208,7 +246,7 @@ export default function Dashboard() {
           {weddings.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-dashed border-[#D4AF37]/50 text-center space-y-4">
               <p className="font-[family-name:var(--font-cormorant)] italic text-2xl text-gray-700">
-                You haven't created any wedding invitations yet.
+                You haven&apos;t created any wedding invitations yet.
               </p>
               <Link
                 href="/builder"
@@ -221,7 +259,9 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {weddings.map((w) => {
                 const fullUrl = `${origin}/${w.slug}`;
-                const title = `${w.bride.name} & ${w.groom.name}`;
+                const title = w.displayOrder === "groom_first"
+                  ? `${w.groom.name} & ${w.bride.name}`
+                  : `${w.bride.name} & ${w.groom.name}`;
                 const templateMeta = getTemplate(w.templateId);
 
                 return (
@@ -236,9 +276,9 @@ export default function Dashboard() {
                     <div>
                       {/* Card Banner */}
                       <div className="relative h-48 w-full bg-[#2A0410] overflow-hidden">
-                        {w.couple?.image || w.bride?.image ? (
+                        {w.couple?.image || w.bride?.image || w.groom?.image ? (
                           <Image
-                            src={w.couple?.image || w.bride?.image}
+                            src={w.couple?.image || w.bride?.image || w.groom?.image}
                             alt={title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
@@ -271,10 +311,10 @@ export default function Dashboard() {
 
                         <div className="space-y-1.5 text-xs text-gray-800 font-medium">
                           <p className="flex items-center gap-2">
-                            <Calendar className="w-3.5 h-3.5 text-[#D4AF37]" /> {w.event.dateText}
+                            <Calendar className="w-3.5 h-3.5 text-[#D4AF37]" /> {w.event?.dateText}
                           </p>
                           <p className="flex items-center gap-2 truncate">
-                            <MapPin className="w-3.5 h-3.5 text-[#D4AF37] flex-shrink-0" /> {w.event.venueTitle}
+                            <MapPin className="w-3.5 h-3.5 text-[#D4AF37] flex-shrink-0" /> {w.event?.venueTitle}
                           </p>
                         </div>
                       </div>
@@ -285,7 +325,7 @@ export default function Dashboard() {
                       <div className="grid grid-cols-3 gap-2 pt-3">
                         <button
                           onClick={() => copyToClipboard(fullUrl, w._id)}
-                          className="flex items-center justify-center gap-1.5 py-2 px-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-xl text-[11px] font-bold border border-gray-200 transition-colors"
+                          className="flex items-center justify-center gap-1.5 py-2 px-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-xl text-xs font-bold border border-gray-200 transition-colors"
                           title="Copy Master Link"
                         >
                           {copiedId === w._id ? (
@@ -297,22 +337,22 @@ export default function Dashboard() {
                         </button>
 
                         <button
-                          onClick={() => shareOnWhatsApp(fullUrl, title)}
-                          className="flex items-center justify-center gap-1.5 py-2 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-[11px] font-bold border border-emerald-200 transition-colors"
-                          title="Share on WhatsApp"
+                          onClick={() => shareMasterLink(w)}
+                          className="flex items-center justify-center gap-1.5 py-2 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200 transition-colors"
+                          title="Share Invitation on WhatsApp"
                         >
                           <Share2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Share Without Guest Details</span>
+                          <span>Share</span>
                         </button>
 
                         <Link
                           href={`/${w.slug}`}
                           target="_blank"
-                          className="flex items-center justify-center gap-1.5 py-2 px-2 bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 text-[#8B1E41] rounded-xl text-[11px] font-bold border border-[#8B1E41]/20 transition-colors"
+                          className="flex items-center justify-center gap-1.5 py-2 px-2 bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 text-[#8B1E41] rounded-xl text-xs font-bold border border-[#8B1E41]/20 transition-colors"
                           title="Open Live Website"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>View Without Guest Details</span>
+                          <span>View</span>
                         </Link>
                       </div>
 
@@ -348,7 +388,7 @@ export default function Dashboard() {
         {weddings.length > 0 && currentWedding && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
 
-            {/* Left Column: Form */}
+            {/* Left Column: Guest Link Generator Form */}
             <div className="lg:col-span-5 bg-white rounded-3xl p-6 md:p-8 border border-[#D4AF37]/40 shadow-sm space-y-6">
               <div className="flex items-center gap-2">
                 <Send className="w-5 h-5 text-[#8B1E41]" />
@@ -357,7 +397,11 @@ export default function Dashboard() {
                     Generate Guest Invite
                   </h3>
                   <p className="text-xs text-gray-600 font-medium">
-                    For: <span className="font-bold text-black">{currentWedding.bride.name} & {currentWedding.groom.name}</span>
+                    For: <span className="font-bold text-black">
+                      {currentWedding.displayOrder === "groom_first"
+                        ? `${currentWedding.groom.name} & ${currentWedding.bride.name}`
+                        : `${currentWedding.bride.name} & ${currentWedding.groom.name}`}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -374,7 +418,10 @@ export default function Dashboard() {
                   >
                     {weddings.map((w) => (
                       <option key={w._id} value={w.slug}>
-                        {w.bride.name} & {w.groom.name} (/{w.slug})
+                        {w.displayOrder === "groom_first"
+                          ? `${w.groom.name} & ${w.bride.name}`
+                          : `${w.bride.name} & ${w.groom.name}`}{" "}
+                        (/{w.slug})
                       </option>
                     ))}
                   </select>
@@ -427,7 +474,7 @@ export default function Dashboard() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Family's Sir Name"
+                    placeholder="e.g. Singh"
                     value={signOffFamily}
                     onChange={(e) => setSignOffFamily(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none text-xs bg-white text-black font-semibold placeholder:text-gray-400"
@@ -472,7 +519,7 @@ export default function Dashboard() {
                 ) : (
                   <div className="divide-y divide-gray-100 max-h-[420px] overflow-y-auto pr-1">
                     {currentWedding.guestInvites.map((guest: any) => {
-                      const guestDisplayName = `${guest.name} ${guest.familySuffix || ""}`.trim();
+                      const guestDisplayName = `${guest.name} ${guest.familySuffix ? `& ${guest.familySuffix}` : ""}`.trim();
 
                       return (
                         <div key={guest._id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -487,7 +534,7 @@ export default function Dashboard() {
                             </h4>
                             {guest.customNote && (
                               <p className="text-xs text-gray-700 italic font-[family-name:var(--font-cormorant)] font-semibold">
-                                "{guest.customNote}"
+                                &ldquo;{guest.customNote}&rdquo;
                               </p>
                             )}
                           </div>
@@ -506,7 +553,7 @@ export default function Dashboard() {
                             </button>
 
                             <button
-                              onClick={() => shareOnWhatsApp(guest.url, guestDisplayName)}
+                              onClick={() => shareGuestLink(currentWedding, guest)}
                               className="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold border border-emerald-200 transition-colors"
                               title="Send on WhatsApp"
                             >
