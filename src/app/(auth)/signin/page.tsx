@@ -220,48 +220,64 @@ function SignInContent() {
           </motion.form>
         ) : (
           <motion.form
-            key="step2"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            onSubmit={handleOtpSubmit}
-            className="space-y-4"
-          >
-            <div>
-              <label className="block text-xs font-bold uppercase text-gray-900 mb-1.5 font-[family-name:var(--font-cinzel)]">
-                One-Time Password
-              </label>
-              <div className="relative">
-                <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none tracking-widest text-lg text-center font-mono font-bold text-black bg-white"
-                  required
-                  disabled={loading}
-                  placeholder="123456"
-                  maxLength={6}
-                />
-              </div>
-            </div>
+  key="step2"
+  initial={{ opacity: 0, x: 20 }}
+  animate={{ opacity: 1, x: 0 }}
+  exit={{ opacity: 0, x: 20 }}
+  onSubmit={handleOtpSubmit}
+  className="space-y-4"
+>
+  {/* Spam Folder Notice */}
+  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+    <Mail className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-white font-bold py-3.5 rounded-xl hover:brightness-110 transition-all shadow-md disabled:opacity-50 text-xs font-[family-name:var(--font-cinzel)] uppercase tracking-wider"
-            >
-              {loading ? "Logging in..." : "Verify & Enter Dashboard"}
-            </button>
+    <div className="text-xs text-amber-800 leading-relaxed">
+      <span className="font-bold">
+        Didn&apos;t receive the verification email?
+      </span>{" "}
+      Please check your{" "}
+      <span className="font-bold">Spam/Junk folder</span> as the email may
+      have been filtered there.
+    </div>
+  </div>
 
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="w-full text-xs text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 pt-2"
-            >
-              <ArrowLeft size={14} /> Back to Credentials
-            </button>
-          </motion.form>
+  <div>
+    <label className="block text-xs font-bold uppercase text-gray-900 mb-1.5 font-[family-name:var(--font-cinzel)]">
+      One-Time Password
+    </label>
+
+    <div className="relative">
+      <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none tracking-widest text-lg text-center font-mono font-bold text-black bg-white"
+        required
+        disabled={loading}
+        placeholder="123456"
+        maxLength={6}
+      />
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-full bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-white font-bold py-3.5 rounded-xl hover:brightness-110 transition-all shadow-md disabled:opacity-50 text-xs font-[family-name:var(--font-cinzel)] uppercase tracking-wider"
+  >
+    {loading ? "Logging in..." : "Verify & Enter Dashboard"}
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setStep(1)}
+    className="w-full text-xs text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 pt-2"
+  >
+    <ArrowLeft size={14} /> Back to Credentials
+  </button>
+</motion.form>
         )}
       </AnimatePresence>
 
