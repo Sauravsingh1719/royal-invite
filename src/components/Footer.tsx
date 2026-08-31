@@ -69,15 +69,15 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#D4AF37] transition-colors">
-                    Admin Portal
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#designs" className="hover:text-[#D4AF37] transition-colors">
+                  <Link href="/templates" className="hover:text-[#D4AF37] transition-colors">
                     Themes &amp; Layouts
                   </Link>
                 </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-gray-600">
+    Privacy Policy
+  </Link>
+                  </li>
               </ul>
             </div>
 
