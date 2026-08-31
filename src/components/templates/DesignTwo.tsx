@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, Suspense } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { decodeGuestPayload } from "@/lib/guest-utils";
@@ -10,8 +10,6 @@ import {
   MapPin, 
   Clock, 
   CalendarHeart, 
-  Sparkles, 
-  Flower2,
   Crown,
   Leaf
 } from "lucide-react";
@@ -90,16 +88,12 @@ const OrnateFrame = ({ children, className = "" }: { children: React.ReactNode; 
 );
 
 const RoyalBadge = ({ text, position = "right" }: { text: string; position?: "left" | "right" }) => (
-  <motion.div
-    className={`absolute -top-4 ${position === "right" ? "-right-3" : "-left-3"} bg-gradient-to-br from-[#8B1E41] to-[#4A1023] text-[#FDFBF7] px-4 py-2 rounded-full shadow-xl border border-[#D4AF37] font-[family-name:var(--font-cinzel)] text-[10px] uppercase font-bold tracking-wider z-30`}
-    style={{ rotate: position === "right" ? 12 : -12 }}
-    initial={{ scale: 0 }}
-    whileInView={{ scale: 1 }}
-    viewport={{ once: true }}
-    transition={{ type: "spring", stiffness: 300, delay: 0.4 }}
+  <div
+    className={`absolute -top-3 ${position === "right" ? "-right-2 sm:-right-3" : "-left-2 sm:-left-3"} bg-gradient-to-br from-[#8B1E41] to-[#4A1023] text-[#FDFBF7] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-xl border border-[#D4AF37] font-[family-name:var(--font-cinzel)] text-[9px] sm:text-[10px] uppercase font-bold tracking-wider z-30`}
+    style={{ transform: position === "right" ? "rotate(10deg)" : "rotate(-10deg)" }}
   >
     {text}
-  </motion.div>
+  </div>
 );
 
 /* ─── Slide Content Components ─── */
@@ -114,7 +108,7 @@ const SlideOne = ({ startEntrance }: { startEntrance: boolean }) => (
     >
       {/* Decorative mandala behind */}
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.06] pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[500px] h-[340px] md:h-[500px] opacity-[0.06] pointer-events-none"
         animate={{ rotate: 360 }}
         transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
       >
@@ -131,21 +125,21 @@ const SlideOne = ({ startEntrance }: { startEntrance: boolean }) => (
       <motion.div
         animate={{ rotate: [0, 15, -15, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="mb-6 inline-block"
+        className="mb-4 sm:mb-6 inline-block"
       >
-        <div className="relative w-32 h-32 md:w-32 md:h-32">
-    <Image
-      src="/ganesha.svg"
-      alt="Lord Ganesha Blessing"
-      fill
-      priority
-      className="object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
-    />
-  </div>
+        <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32">
+          <Image
+            src="/ganesha.svg"
+            alt="Lord Ganesha Blessing"
+            fill
+            priority
+            className="object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
+          />
+        </div>
       </motion.div>
 
       <motion.h2 
-        className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.5em] uppercase text-sm md:text-base mb-6 font-bold"
+        className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.4em] sm:tracking-[0.5em] uppercase text-xs sm:text-sm md:text-base mb-4 sm:mb-6 font-bold"
         initial={{ opacity: 0, y: 20 }}
         animate={startEntrance ? { opacity: 1, y: 0 } : {}}
         transition={{ delay: 0.3, duration: 1 }}
@@ -154,14 +148,14 @@ const SlideOne = ({ startEntrance }: { startEntrance: boolean }) => (
       </motion.h2>
 
       <motion.div
-        className="w-24 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-6"
+        className="w-20 sm:w-24 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-4 sm:mb-6"
         initial={{ scaleX: 0 }}
         animate={startEntrance ? { scaleX: 1 } : {}}
         transition={{ delay: 0.6, duration: 1 }}
       />
 
       <motion.p 
-        className="font-[family-name:var(--font-cormorant)] text-gray-500 italic text-lg md:text-xl"
+        className="font-[family-name:var(--font-cormorant)] text-gray-500 italic text-base sm:text-lg md:text-xl max-w-sm sm:max-w-md mx-auto"
         initial={{ opacity: 0 }}
         animate={startEntrance ? { opacity: 1 } : {}}
         transition={{ delay: 0.9, duration: 1 }}
@@ -170,16 +164,16 @@ const SlideOne = ({ startEntrance }: { startEntrance: boolean }) => (
       </motion.p>
 
       <motion.div
-        className="mt-12"
+        className="mt-8 sm:mt-12"
         initial={{ opacity: 0 }}
         animate={startEntrance ? { opacity: 1 } : {}}
         transition={{ delay: 1.5 }}
       >
         <motion.div
-          animate={{ y: [0, 10, 0] }}
+          animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2">
             <path d="M12 5v14M5 12l7 7 7-7" />
           </svg>
         </motion.div>
@@ -190,26 +184,21 @@ const SlideOne = ({ startEntrance }: { startEntrance: boolean }) => (
 
 const SlideTwo = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
   <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="text-center max-w-3xl"
-    >
-      <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[10px] uppercase font-bold mb-6">
+    <div className="text-center max-w-3xl flex flex-col items-center">
+      <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[10px] uppercase font-bold mb-3 sm:mb-5">
         Introducing
       </p>
 
-      <div className="relative inline-block mb-8">
+      <div className="relative inline-block mb-4 sm:mb-6">
         <OrnateFrame className="p-1 md:p-2">
-          <div className="relative w-[280px] h-[380px] md:w-[360px] md:h-[480px] overflow-hidden rounded-t-full rounded-b-2xl bg-[#FDF4F6]">
+          <div className="relative w-[220px] h-[300px] sm:w-[260px] sm:h-[350px] md:w-[360px] md:h-[460px] overflow-hidden rounded-t-full rounded-b-2xl bg-[#FDF4F6]">
             {wedding.couple.image ? (
               <Image
                 src={wedding.couple.image}
                 alt="The Couple"
                 fill
                 className="object-cover object-top"
-                sizes="(max-width: 768px) 280px, 360px"
+                sizes="(max-width: 768px) 260px, 360px"
                 priority
               />
             ) : (
@@ -217,11 +206,11 @@ const SlideTwo = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
                 <Heart className="w-16 h-16 text-[#D4AF37]/30" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
             
             {/* Names overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-              <p className="font-[family-name:var(--font-great-vibes)] text-4xl md:text-5xl text-[#FDFBF7] drop-shadow-lg">
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-center">
+              <p className="font-[family-name:var(--font-great-vibes)] text-3xl sm:text-4xl md:text-5xl text-[#FDFBF7] drop-shadow-lg leading-tight">
                 {wedding.bride.name} <span className="text-[#D4AF37] mx-1">&</span> {wedding.groom.name}
               </p>
             </div>
@@ -230,158 +219,122 @@ const SlideTwo = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
 
         {/* Rotating decorative ring */}
         <motion.div
-          className="absolute -inset-6 rounded-full border border-dashed border-[#D4AF37]/30 pointer-events-none"
+          className="absolute -inset-4 sm:-inset-6 rounded-full border border-dashed border-[#D4AF37]/30 pointer-events-none"
           animate={{ rotate: 360 }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
         />
       </div>
 
       {wedding.couple.quote && (
-        <motion.p 
-          className="font-[family-name:var(--font-cormorant)] italic text-xl md:text-2xl text-gray-600 max-w-lg mx-auto"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-        >
-          <span className="text-[#D4AF37] text-2xl">"</span>
+        <p className="font-[family-name:var(--font-cormorant)] italic text-lg sm:text-xl md:text-2xl text-gray-600 max-w-md md:max-w-lg mx-auto px-2">
+          <span className="text-[#D4AF37] text-xl md:text-2xl">"</span>
           {wedding.couple.quote}
-          <span className="text-[#D4AF37] text-2xl">"</span>
-        </motion.p>
+          <span className="text-[#D4AF37] text-xl md:text-2xl">"</span>
+        </p>
       )}
-    </motion.div>
+    </div>
   </div>
 );
 
 const SlideThree = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
-  <div className="absolute inset-0 flex items-center justify-center z-20 px-6">
-    <div className="max-w-4xl w-full flex flex-col md:flex-row items-center gap-8 md:gap-16">
+  <div className="absolute inset-0 flex items-center justify-center z-20 px-4 sm:px-6">
+    <div className="max-w-4xl w-full flex flex-col md:flex-row items-center justify-center gap-5 sm:gap-8 md:gap-14">
       {/* Portrait */}
-      <motion.div
-        className="relative flex-shrink-0"
-        initial={{ opacity: 0, x: -80, rotate: -5 }}
-        whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-      >
-        <div className="relative p-2 bg-white rounded-3xl shadow-2xl border border-[#D4AF37]/30">
+      <div className="relative flex-shrink-0">
+        <div className="relative p-1.5 sm:p-2 bg-white rounded-3xl shadow-2xl border border-[#D4AF37]/30">
           <RoyalBadge text="The Bride" position="right" />
-          <div className="relative w-[240px] h-[320px] md:w-[300px] md:h-[400px] rounded-2xl overflow-hidden bg-[#FDF4F6]">
+          <div className="relative w-[180px] h-[240px] sm:w-[220px] sm:h-[300px] md:w-[300px] md:h-[400px] rounded-2xl overflow-hidden bg-[#FDF4F6]">
             <Image
               src={wedding.bride.image}
               alt={wedding.bride.name}
               fill
               className="object-cover object-top"
-              sizes="(max-width: 768px) 240px, 300px"
+              sizes="(max-width: 640px) 180px, (max-width: 768px) 220px, 300px"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#8B1E41]/20 to-transparent" />
           </div>
         </div>
         {/* Glow */}
         <div className="absolute -inset-4 bg-[#D4AF37]/10 rounded-full blur-3xl -z-10" />
-      </motion.div>
+      </div>
 
       {/* Details */}
-      <motion.div
-        className="text-center md:text-left flex-1"
-        initial={{ opacity: 0, x: 80 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1, delay: 0.2 }}
-      >
-        <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[10px] uppercase font-bold mb-3">
+      <div className="text-center md:text-left flex-1 max-w-md">
+        <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[9px] sm:text-[10px] uppercase font-bold mb-1.5 sm:mb-2">
           Introducing
         </p>
-        <h2 className="font-[family-name:var(--font-great-vibes)] text-6xl md:text-7xl text-[#8B1E41] mb-3">
+        <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl md:text-7xl text-[#8B1E41] mb-1 sm:mb-2">
           {wedding.bride.name}
         </h2>
-        <p className="font-[family-name:var(--font-cormorant)] text-gray-600 italic text-lg md:text-xl font-semibold mb-6">
+        <p className="font-[family-name:var(--font-cormorant)] text-gray-600 italic text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-5">
           {wedding.bride.parents}
         </p>
 
         {wedding.bride.traits && (
-          <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center md:justify-start">
             {wedding.bride.traits.map((trait, idx) => (
-              <motion.span
+              <span
                 key={idx}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 + idx * 0.1 }}
-                className="inline-block bg-white/80 border border-[#D4AF37]/30 rounded-full px-4 py-2 font-[family-name:var(--font-cormorant)] italic text-[#8B1E41] text-sm shadow-sm"
+                className="inline-block bg-white/90 border border-[#D4AF37]/30 rounded-full px-3 py-1 sm:px-4 sm:py-1.5 font-[family-name:var(--font-cormorant)] italic text-[#8B1E41] text-xs sm:text-sm shadow-sm"
               >
                 {trait}
-              </motion.span>
+              </span>
             ))}
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   </div>
 );
 
 const SlideFour = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
-  <div className="absolute inset-0 flex items-center justify-center z-20 px-6">
-    <div className="max-w-4xl w-full flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16">
+  <div className="absolute inset-0 flex items-center justify-center z-20 px-4 sm:px-6">
+    <div className="max-w-4xl w-full flex flex-col md:flex-row-reverse items-center justify-center gap-5 sm:gap-8 md:gap-14">
       {/* Portrait */}
-      <motion.div
-        className="relative flex-shrink-0"
-        initial={{ opacity: 0, x: 80, rotate: 5 }}
-        whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-      >
-        <div className="relative p-2 bg-white rounded-3xl shadow-2xl border border-[#D4AF37]/30">
+      <div className="relative flex-shrink-0">
+        <div className="relative p-1.5 sm:p-2 bg-white rounded-3xl shadow-2xl border border-[#D4AF37]/30">
           <RoyalBadge text="The Groom" position="left" />
-          <div className="relative w-[240px] h-[320px] md:w-[300px] md:h-[400px] rounded-2xl overflow-hidden bg-[#F4F7F4]">
+          <div className="relative w-[180px] h-[240px] sm:w-[220px] sm:h-[300px] md:w-[300px] md:h-[400px] rounded-2xl overflow-hidden bg-[#F4F7F4]">
             <Image
               src={wedding.groom.image}
               alt={wedding.groom.name}
               fill
               className="object-cover object-top"
-              sizes="(max-width: 768px) 240px, 300px"
+              sizes="(max-width: 640px) 180px, (max-width: 768px) 220px, 300px"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#8B1E41]/20 to-transparent" />
           </div>
         </div>
         <div className="absolute -inset-4 bg-[#D4AF37]/10 rounded-full blur-3xl -z-10" />
-      </motion.div>
+      </div>
 
       {/* Details */}
-      <motion.div
-        className="text-center md:text-right flex-1"
-        initial={{ opacity: 0, x: -80 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1, delay: 0.2 }}
-      >
-        <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[10px] uppercase font-bold mb-3">
+      <div className="text-center md:text-right flex-1 max-w-md">
+        <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[9px] sm:text-[10px] uppercase font-bold mb-1.5 sm:mb-2">
           Introducing
         </p>
-        <h2 className="font-[family-name:var(--font-great-vibes)] text-6xl md:text-7xl text-[#8B1E41] mb-3">
+        <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl md:text-7xl text-[#8B1E41] mb-1 sm:mb-2">
           {wedding.groom.name}
         </h2>
-        <p className="font-[family-name:var(--font-cormorant)] text-gray-600 italic text-lg md:text-xl font-semibold mb-6">
+        <p className="font-[family-name:var(--font-cormorant)] text-gray-600 italic text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-5">
           {wedding.groom.parents}
         </p>
 
         {wedding.groom.traits && (
-          <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center md:justify-end">
             {wedding.groom.traits.map((trait, idx) => (
-              <motion.span
+              <span
                 key={idx}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 + idx * 0.1 }}
-                className="inline-block bg-white/80 border border-[#D4AF37]/30 rounded-full px-4 py-2 font-[family-name:var(--font-cormorant)] italic text-[#8B1E41] text-sm shadow-sm"
+                className="inline-block bg-white/90 border border-[#D4AF37]/30 rounded-full px-3 py-1 sm:px-4 sm:py-1.5 font-[family-name:var(--font-cormorant)] italic text-[#8B1E41] text-xs sm:text-sm shadow-sm"
               >
                 {trait}
-              </motion.span>
+              </span>
             ))}
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   </div>
 );
@@ -407,56 +360,47 @@ const SlideFive = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
       ))}
     </div>
 
-    <motion.div
-      className="relative z-10 text-center px-6 max-w-3xl"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-    >
+    <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl">
       <motion.div
         animate={{ rotate: [0, 10, -10, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="mb-6 inline-block"
+        className="mb-3 sm:mb-5 inline-block"
       >
-        <Crown className="w-10 h-10 text-[#D4AF37] mx-auto opacity-80" />
+        <Crown className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mx-auto opacity-80" />
       </motion.div>
 
-      <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[10px] uppercase font-bold mb-8">
+      <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] tracking-[0.3em] text-[9px] sm:text-[10px] uppercase font-bold mb-4 sm:mb-6">
         You are cordially invited to
       </p>
 
-      <h2 className="font-[family-name:var(--font-great-vibes)] text-5xl md:text-7xl text-[#FDFBF7] mb-2 drop-shadow-lg">
+      <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl sm:text-5xl md:text-7xl text-[#FDFBF7] mb-1 drop-shadow-lg">
         The Wedding of
       </h2>
       
-      <h3 className="font-[family-name:var(--font-cinzel)] text-2xl md:text-4xl text-[#D4AF37] font-bold tracking-wider mb-8">
-        {wedding.bride.name} <span className="text-[#FDFBF7]/60 text-xl">&</span> {wedding.groom.name}
+      <h3 className="font-[family-name:var(--font-cinzel)] text-xl sm:text-2xl md:text-4xl text-[#D4AF37] font-bold tracking-wider mb-5 sm:mb-8">
+        {wedding.bride.name} <span className="text-[#FDFBF7]/60 text-lg sm:text-xl">&</span> {wedding.groom.name}
       </h3>
 
-      <div className="w-32 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-8" />
+      <div className="w-24 sm:w-32 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-5 sm:mb-8" />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         {[
-          { icon: <CalendarHeart className="w-6 h-6" />, label: "Date", value: wedding.event.dateText },
-          { icon: <Clock className="w-6 h-6" />, label: "Time", value: wedding.event.timeText },
-          { icon: <MapPin className="w-6 h-6" />, label: "Venue", value: wedding.event.venueTitle },
+          { icon: <CalendarHeart className="w-5 h-5 sm:w-6 sm:h-6" />, label: "Date", value: wedding.event.dateText },
+          { icon: <Clock className="w-5 h-5 sm:w-6 sm:h-6" />, label: "Time", value: wedding.event.timeText },
+          { icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />, label: "Venue", value: wedding.event.venueTitle },
         ].map((item, i) => (
-          <motion.div
+          <div
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 + i * 0.15 }}
-            className="bg-white/5 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-5 hover:border-[#D4AF37]/50 transition-colors"
+            className="bg-white/5 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-3 sm:p-4 md:p-5 hover:border-[#D4AF37]/50 transition-colors"
           >
-            <div className="text-[#D4AF37] mb-2 flex justify-center">{item.icon}</div>
-            <p className="font-[family-name:var(--font-cinzel)] text-[10px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">{item.label}</p>
-            <p className="font-[family-name:var(--font-cormorant)] text-[#FDFBF7] text-lg font-semibold">{item.value}</p>
-          </motion.div>
+            <div className="text-[#D4AF37] mb-1 sm:mb-2 flex justify-center">{item.icon}</div>
+            <p className="font-[family-name:var(--font-cinzel)] text-[9px] sm:text-[10px] text-[#D4AF37]/70 uppercase tracking-widest mb-0.5">{item.label}</p>
+            <p className="font-[family-name:var(--font-cormorant)] text-[#FDFBF7] text-base sm:text-lg font-semibold">{item.value}</p>
+          </div>
         ))}
       </div>
 
-      <p className="font-[family-name:var(--font-cormorant)] text-gray-400 italic text-lg mb-8">
+      <p className="font-[family-name:var(--font-cormorant)] text-gray-400 italic text-sm sm:text-base md:text-lg mb-5 sm:mb-8">
         {wedding.event.venueAddress}
       </p>
 
@@ -464,15 +408,15 @@ const SlideFive = ({ wedding }: { wedding: DesignTwoProps["wedding"] }) => (
         href={wedding.event.googleMapsUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-[#FDFBF7] rounded-full font-[family-name:var(--font-cinzel)] text-xs uppercase tracking-widest border border-[#D4AF37]/30 shadow-xl relative overflow-hidden group"
+        className="inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-[#FDFBF7] rounded-full font-[family-name:var(--font-cinzel)] text-[10px] sm:text-xs uppercase tracking-widest border border-[#D4AF37]/30 shadow-xl relative overflow-hidden group"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
       >
         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-        <MapPin className="w-4 h-4 relative z-10" />
+        <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 relative z-10" />
         <span className="relative z-10">Navigate to Venue</span>
       </motion.a>
-    </motion.div>
+    </div>
   </div>
 );
 
@@ -482,17 +426,11 @@ const SlideSixContent = ({ defaultFam, wedding }: { defaultFam: string; wedding:
   const familyName = payload?.fam || defaultFam;
 
   return (
-    <div className="w-full max-w-2xl px-6 flex flex-col items-center text-center">
+    <div className="w-full max-w-2xl px-4 sm:px-6 flex flex-col items-center text-center">
       {/* Monogram */}
-      <motion.div
-        className="flex items-center justify-center gap-4 mb-10"
-        initial={{ opacity: 0, scale: 0.8 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white border-2 border-[#D4AF37] flex items-center justify-center shadow-lg">
-          <span className="font-[family-name:var(--font-cinzel)] text-xl md:text-2xl text-[#8B1E41] font-bold">
+      <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white border-2 border-[#D4AF37] flex items-center justify-center shadow-lg">
+          <span className="font-[family-name:var(--font-cinzel)] text-lg sm:text-2xl text-[#8B1E41] font-bold">
             {wedding.bride.name.charAt(0)}
           </span>
         </div>
@@ -500,97 +438,57 @@ const SlideSixContent = ({ defaultFam, wedding }: { defaultFam: string; wedding:
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <Heart className="w-6 h-6 text-[#8B1E41] fill-[#8B1E41]" />
+          <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-[#8B1E41] fill-[#8B1E41]" />
         </motion.div>
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white border-2 border-[#D4AF37] flex items-center justify-center shadow-lg">
-          <span className="font-[family-name:var(--font-cinzel)] text-xl md:text-2xl text-[#8B1E41] font-bold">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white border-2 border-[#D4AF37] flex items-center justify-center shadow-lg">
+          <span className="font-[family-name:var(--font-cinzel)] text-lg sm:text-2xl text-[#8B1E41] font-bold">
             {wedding.groom.name.charAt(0)}
           </span>
         </div>
-      </motion.div>
+      </div>
 
       {payload?.m && (
-        <motion.div 
-          className="mb-10 w-full bg-white/80 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-[#D4AF37]/30 shadow-lg relative overflow-hidden"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* Decorative corners */}
+        <div className="mb-6 sm:mb-8 w-full bg-white/90 backdrop-blur-md p-6 sm:p-10 rounded-3xl border border-[#D4AF37]/30 shadow-lg relative overflow-hidden">
           <div className="absolute top-3 left-3 w-6 h-6 border-t border-l border-[#D4AF37]/40" />
           <div className="absolute top-3 right-3 w-6 h-6 border-t border-r border-[#D4AF37]/40" />
           <div className="absolute bottom-3 left-3 w-6 h-6 border-b border-l border-[#D4AF37]/40" />
           <div className="absolute bottom-3 right-3 w-6 h-6 border-b border-r border-[#D4AF37]/40" />
 
-          <motion.div
-            className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-[#8B1E41] to-[#4A1023] border-2 border-[#D4AF37] shadow-xl flex items-center justify-center"
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", delay: 0.3 }}
-          >
-            <Heart className="w-5 h-5 text-[#D4AF37] fill-[#D4AF37]" />
-          </motion.div>
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-gradient-to-br from-[#8B1E41] to-[#4A1023] border-2 border-[#D4AF37] shadow-xl flex items-center justify-center">
+            <Heart className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" />
+          </div>
 
-          <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] uppercase tracking-[0.3em] text-[10px] font-bold mb-4 mt-4">
+          <p className="font-[family-name:var(--font-cinzel)] text-[#D4AF37] uppercase tracking-[0.3em] text-[9px] sm:text-[10px] font-bold mb-3 mt-3">
             A Personal Note
           </p>
           {payload.n && (
-            <h2 className="font-[family-name:var(--font-great-vibes)] text-4xl text-[#8B1E41] mb-4">
+            <h2 className="font-[family-name:var(--font-great-vibes)] text-3xl sm:text-4xl text-[#8B1E41] mb-2 sm:mb-3">
               Dear {payload.n},
             </h2>
           )}
-          <p className="font-[family-name:var(--font-cormorant)] italic text-xl text-gray-700 leading-relaxed">
-            <span className="text-[#D4AF37] text-2xl mr-1">"</span>
+          <p className="font-[family-name:var(--font-cormorant)] italic text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed">
+            <span className="text-[#D4AF37] text-xl mr-1">"</span>
             {payload.m}
-            <span className="text-[#D4AF37] text-2xl ml-1">"</span>
+            <span className="text-[#D4AF37] text-xl ml-1">"</span>
           </p>
-        </motion.div>
+        </div>
       )}
 
-      <motion.p 
-        className="font-[family-name:var(--font-cormorant)] italic text-2xl md:text-3xl text-[#8B1E41] leading-relaxed max-w-xl mx-auto mb-6"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
+      <p className="font-[family-name:var(--font-cormorant)] italic text-xl sm:text-2xl md:text-3xl text-[#8B1E41] leading-relaxed max-w-xl mx-auto mb-4 sm:mb-6">
         We gracefully await your presence to bless the couple as they embark on this beautiful journey.
-      </motion.p>
+      </p>
 
-      <motion.div 
-        className="w-20 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-6"
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-      />
+      <div className="w-16 sm:w-20 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-4 sm:mb-6" />
 
-      <motion.p 
-        className="font-[family-name:var(--font-cinzel)] text-gray-500 uppercase tracking-[0.3em] text-xs font-bold mb-2"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
+      <p className="font-[family-name:var(--font-cinzel)] text-gray-500 uppercase tracking-[0.3em] text-[10px] sm:text-xs font-bold mb-1">
         With Warm Regards,
-      </motion.p>
+      </p>
 
-      <motion.p 
-        className="font-[family-name:var(--font-great-vibes)] text-[#8B1E41] text-5xl md:text-6xl capitalize"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.2 }}
-      >
+      <p className="font-[family-name:var(--font-great-vibes)] text-[#8B1E41] text-4xl sm:text-5xl md:text-6xl capitalize">
         The {familyName} Family
-      </motion.p>
+      </p>
 
-      <motion.div 
-        className="w-full text-center mt-12 pointer-events-auto"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.4 }}
-      >
+      <div className="w-full text-center mt-8 sm:mt-12 pointer-events-auto">
         <div className="flex items-center justify-center gap-3 mb-2">
           <div className="h-px w-8 bg-[#D4AF37]/40" />
           <Leaf className="w-3 h-3 text-[#D4AF37]/60" />
@@ -600,11 +498,11 @@ const SlideSixContent = ({ defaultFam, wedding }: { defaultFam: string; wedding:
           href="https://saurav190.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-[family-name:var(--font-cinzel)] text-[#D4AF37]/60 hover:text-[#8B1E41] text-[10px] uppercase tracking-[0.3em] transition-colors"
+          className="font-[family-name:var(--font-cinzel)] text-[#D4AF37]/60 hover:text-[#8B1E41] text-[9px] sm:text-[10px] uppercase tracking-[0.3em] transition-colors"
         >
           Designed & Developed by Saurav Singh
         </a>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -627,16 +525,54 @@ export default function DesignTwo({ wedding }: DesignTwoProps) {
     }
   }, []);
 
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 25, restDelta: 0.001 });
+  const { scrollYProgress } = useScroll({ 
+    target: containerRef, 
+    offset: ["start start", "end end"] 
+  });
+  
+  // Tighter spring response on mobile touch interactions
+  const smoothProgress = useSpring(scrollYProgress, { 
+    stiffness: 120, 
+    damping: 30, 
+    restDelta: 0.001 
+  });
 
-  // 600vh Timeline — 6 Slides
-  const s1 = { opacity: useTransform(smoothProgress, [0, 0.12, 0.16], [1, 1, 0]), scale: useTransform(smoothProgress, [0, 0.16], [1, 1.1]), pe: useTransform(smoothProgress, (v) => (v < 0.16 ? "auto" : "none")) };
-  const s2 = { opacity: useTransform(smoothProgress, [0.12, 0.16, 0.28, 0.32], [0, 1, 1, 0]), scale: useTransform(smoothProgress, [0.12, 0.32], [0.95, 1.05]), pe: useTransform(smoothProgress, (v) => (v >= 0.12 && v <= 0.32 ? "auto" : "none")) };
-  const s3 = { opacity: useTransform(smoothProgress, [0.28, 0.32, 0.44, 0.48], [0, 1, 1, 0]), scale: useTransform(smoothProgress, [0.28, 0.48], [0.95, 1.05]), pe: useTransform(smoothProgress, (v) => (v >= 0.28 && v <= 0.48 ? "auto" : "none")) };
-  const s4 = { opacity: useTransform(smoothProgress, [0.44, 0.48, 0.60, 0.64], [0, 1, 1, 0]), scale: useTransform(smoothProgress, [0.44, 0.64], [0.95, 1.05]), pe: useTransform(smoothProgress, (v) => (v >= 0.44 && v <= 0.64 ? "auto" : "none")) };
-  const s5 = { opacity: useTransform(smoothProgress, [0.60, 0.64, 0.76, 0.80], [0, 1, 1, 0]), scale: useTransform(smoothProgress, [0.60, 0.80], [1.08, 1]), pe: useTransform(smoothProgress, (v) => (v >= 0.60 && v <= 0.80 ? "auto" : "none")) };
-  const s6 = { opacity: useTransform(smoothProgress, [0.76, 0.80, 1], [0, 1, 1]), scale: useTransform(smoothProgress, [0.76, 1], [0.95, 1]), pe: useTransform(smoothProgress, (v) => (v >= 0.76 ? "auto" : "none")) };
+  // Balanced 600vh timeline with solid 13-14% visibility plateaus
+  const s1 = { 
+    opacity: useTransform(smoothProgress, [0, 0.12, 0.17], [1, 1, 0]), 
+    scale: useTransform(smoothProgress, [0, 0.17], [1, 1.05]), 
+    pe: useTransform(smoothProgress, (v) => (v < 0.17 ? "auto" : "none")) 
+  };
+  
+  const s2 = { 
+    opacity: useTransform(smoothProgress, [0.13, 0.18, 0.31, 0.35], [0, 1, 1, 0]), 
+    scale: useTransform(smoothProgress, [0.13, 0.35], [0.95, 1.05]), 
+    pe: useTransform(smoothProgress, (v) => (v >= 0.13 && v <= 0.35 ? "auto" : "none")) 
+  };
+  
+  const s3 = { 
+    opacity: useTransform(smoothProgress, [0.31, 0.35, 0.48, 0.52], [0, 1, 1, 0]), 
+    scale: useTransform(smoothProgress, [0.31, 0.52], [0.95, 1.05]), 
+    pe: useTransform(smoothProgress, (v) => (v >= 0.31 && v <= 0.52 ? "auto" : "none")) 
+  };
+  
+  const s4 = { 
+    opacity: useTransform(smoothProgress, [0.48, 0.52, 0.65, 0.69], [0, 1, 1, 0]), 
+    scale: useTransform(smoothProgress, [0.48, 0.69], [0.95, 1.05]), 
+    pe: useTransform(smoothProgress, (v) => (v >= 0.48 && v <= 0.69 ? "auto" : "none")) 
+  };
+  
+  const s5 = { 
+    opacity: useTransform(smoothProgress, [0.65, 0.69, 0.82, 0.86], [0, 1, 1, 0]), 
+    scale: useTransform(smoothProgress, [0.65, 0.86], [1.05, 1]), 
+    pe: useTransform(smoothProgress, (v) => (v >= 0.65 && v <= 0.86 ? "auto" : "none")) 
+  };
+  
+  const s6 = { 
+    opacity: useTransform(smoothProgress, [0.82, 0.86, 1], [0, 1, 1]), 
+    scale: useTransform(smoothProgress, [0.82, 1], [0.95, 1]), 
+    pe: useTransform(smoothProgress, (v) => (v >= 0.82 ? "auto" : "none")) 
+  };
 
   return (
     <main ref={containerRef} className="h-[600vh] bg-[#FDFBF7] text-gray-800 relative">
@@ -646,12 +582,12 @@ export default function DesignTwo({ wedding }: DesignTwoProps) {
         {/* Background */}
         <div className="absolute inset-0 z-0 bg-[#FBF8F1] pointer-events-none overflow-hidden">
           <div className="absolute inset-0 opacity-40 mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')]" />
-          <div className="absolute inset-4 md:inset-6 border border-[#D4AF37]/30 rounded-xl" />
+          <div className="absolute inset-3 sm:inset-4 md:inset-6 border border-[#D4AF37]/30 rounded-xl" />
           {/* Corner accents */}
-          <div className="absolute top-4 left-4 md:top-6 md:left-6 w-6 h-6 border-t-2 border-l-2 border-[#D4AF37]/50 rounded-tl-lg" />
-          <div className="absolute top-4 right-4 md:top-6 md:right-6 w-6 h-6 border-t-2 border-r-2 border-[#D4AF37]/50 rounded-tr-lg" />
-          <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 w-6 h-6 border-b-2 border-l-2 border-[#D4AF37]/50 rounded-bl-lg" />
-          <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-6 h-6 border-b-2 border-r-2 border-[#D4AF37]/50 rounded-br-lg" />
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 md:top-6 md:left-6 w-6 h-6 border-t-2 border-l-2 border-[#D4AF37]/50 rounded-tl-lg" />
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 w-6 h-6 border-t-2 border-r-2 border-[#D4AF37]/50 rounded-tr-lg" />
+          <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 md:bottom-6 md:left-6 w-6 h-6 border-b-2 border-l-2 border-[#D4AF37]/50 rounded-bl-lg" />
+          <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 w-6 h-6 border-b-2 border-r-2 border-[#D4AF37]/50 rounded-br-lg" />
         </div>
 
         {/* Slide 1: Opening */}

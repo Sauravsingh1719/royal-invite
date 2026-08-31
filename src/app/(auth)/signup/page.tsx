@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,6 +15,7 @@ import {
   CheckCircle2,
   KeyRound,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -76,7 +78,7 @@ export default function SignUpPage() {
     }
   };
 
-  // Step 2: Verify OTP and Activate Account
+  // Step 2: Verify OTP and Automatically Sign In & Route to Dashboard
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -101,9 +103,22 @@ export default function SignUpPage() {
       }
 
       setSuccess(true);
-      setTimeout(() => {
-        router.push("/signin?registered=true");
-      }, 1500);
+
+      // Auto login using credentials
+      const signInResult = await signIn("credentials", {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        // Fallback to signin if session establishment has an issue
+        window.location.href = "/signin?registered=true";
+        return;
+      }
+
+      // Direct entry to Dashboard
+      window.location.href = "/dashboard";
     } catch {
       setError("Verification failed. Please try again.");
       setLoading(false);
@@ -126,17 +141,16 @@ export default function SignUpPage() {
               <KeyRound className="h-6 w-6 text-[#D4AF37]" />
             )}
           </div>
-          
+
           <h1 className="text-2xl font-bold text-gray-900 font-[family-name:var(--font-cinzel)]">
             {step === 1 ? "Join RoyalInvites" : "Verify Your Email"}
           </h1>
-          
+
           <p className="text-gray-600 mt-1 text-xs font-medium">
             {step === 1
               ? "Create your account to start building cinematic wedding experiences"
               : `Enter the 6-digit verification code sent to ${email}`}
           </p>
-          
         </div>
 
         {error && (
@@ -150,7 +164,7 @@ export default function SignUpPage() {
           <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
             <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
             <div className="text-xs text-emerald-800 font-bold">
-              Email verified! Redirecting to Sign In...
+              Account verified! Entering your royal dashboard...
             </div>
           </div>
         )}
@@ -250,63 +264,63 @@ export default function SignUpPage() {
             </motion.form>
           ) : (
             <motion.form
-               key="signup-step2"
-                   initial={{ opacity: 0, x: 20 }}
-                 animate={{ opacity: 1, x: 0 }}
-                   exit={{ opacity: 0, x: 20 }}
-                     onSubmit={handleVerifyOtp}
-                       className="space-y-4"
-                    >
-  {/* Spam Folder Notice */}
-  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-    <Mail className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              key="signup-step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              onSubmit={handleVerifyOtp}
+              className="space-y-4"
+            >
+              {/* Spam Folder Notice */}
+              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+                <Mail className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-amber-800 leading-relaxed">
+                  <span className="font-bold">
+                    Didn&apos;t receive the verification email?
+                  </span>{" "}
+                  Please check your{" "}
+                  <span className="font-bold">Spam/Junk folder</span> as the email may
+                  have been filtered there.
+                </div>
+              </div>
 
-    <div className="text-xs text-amber-800 leading-relaxed">
-      <span className="font-bold">
-        Didn&apos;t receive the verification email?
-      </span>{" "}
-      Please check your{" "}
-      <span className="font-bold">Spam/Junk folder</span> as the email may
-      have been filtered there.
-    </div>
-  </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-900 mb-1.5 font-[family-name:var(--font-cinzel)]">
+                  Enter 6-Digit Verification Code
+                </label>
+                <div className="relative">
+                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="text"
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="123456"
+                    maxLength={6}
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none tracking-widest text-lg text-center font-mono font-bold text-black bg-white"
+                  />
+                </div>
+              </div>
 
-  <div>
-    <label className="block text-xs font-bold uppercase text-gray-900 mb-1.5 font-[family-name:var(--font-cinzel)]">
-      Enter 6-Digit Verification Code
-    </label>
+              <button
+                type="submit"
+                disabled={loading || success}
+                className="w-full py-3.5 bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-white font-bold rounded-xl shadow-md hover:brightness-110 transition-all font-[family-name:var(--font-cinzel)] uppercase tracking-wider text-xs disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {loading
+                  ? "Activating & Logging In..."
+                  : "Verify & Enter Dashboard"}
+              </button>
 
-    <div className="relative">
-      <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-
-      <input
-        type="text"
-        required
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-        placeholder="123456"
-        maxLength={6}
-        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none tracking-widest text-lg text-center font-mono font-bold text-black bg-white"
-      />
-    </div>
-  </div>
-
-  <button
-    type="submit"
-    disabled={loading || success}
-    className="w-full py-3.5 bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-white font-bold rounded-xl shadow-md hover:brightness-110 transition-all font-[family-name:var(--font-cinzel)] uppercase tracking-wider text-xs disabled:opacity-50"
-  >
-    {loading ? "Verifying Account..." : "Verify & Activate Account"}
-  </button>
-
-  <button
-    type="button"
-    onClick={() => setStep(1)}
-    className="w-full text-xs text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1.5 pt-2 font-medium"
-  >
-    <ArrowLeft size={14} /> Back to Details
-  </button>
-</motion.form>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="w-full text-xs text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1.5 pt-2 font-medium"
+              >
+                <ArrowLeft size={14} /> Back to Details
+              </button>
+            </motion.form>
           )}
         </AnimatePresence>
 

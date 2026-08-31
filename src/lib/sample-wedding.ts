@@ -1,7 +1,7 @@
 export const sampleDesignOneWedding = {
   templateId: "design-one" as const,
   bride: {
-    name: "Kalyani [Your Bride Name]",
+    name: "[Your Bride Name]",
     parents: "D/o Smt. Sangeeta & Shri Manoj Singh [Bride's Parents Description]",
     image: "/bride.jpg",
     traits: [
@@ -11,7 +11,7 @@ export const sampleDesignOneWedding = {
     ],
   },
   groom: {
-    name: "Sachin [Your Groom Name]",
+    name: "[Your Groom Name]",
     parents: "S/o Smt. Rekha & Shri Arvind Rai [Groom's Parents Description]",
     image: "/groom.jpg",
     traits: [
@@ -38,12 +38,12 @@ export const sampleDesignOneWedding = {
 export const sampleDesignTwoWedding = {
   templateId: "design-two" as const,
   bride: {
-    name: "Kalyani [Your Bride Name]",
+    name: "[Your Bride Name]",
     parents: "D/o Smt. Sangeeta & Shri Manoj Singh [Bride's Parents]",
     image: "/bride.jpg",
   },
   groom: {
-    name: "Sachin [Your Groom Name]",
+    name: "[Your Groom Name]",
     parents: "S/o Smt. Rekha & Shri Arvind Rai [Groom's Parents]",
     image: "/groom.jpg",
   },
