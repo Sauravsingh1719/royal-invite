@@ -36,14 +36,14 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     const userId = (session.user as any).id;
-    const normalizedSlug = data.slug.toLowerCase().trim();
+    let finalSlug = (data.slug || "royal-wedding").toLowerCase().trim().replace(/[^a-z0-9-]/g, "-");
 
-    const existing = await Wedding.findOne({ slug: normalizedSlug });
-    if (existing) {
-      return NextResponse.json(
-        { message: "This URL slug is already taken. Please choose a different link." },
-        { status: 409 }
-      );
+    // Auto-resolve slug collision by appending a unique 3-digit suffix
+    let existing = await Wedding.findOne({ slug: finalSlug });
+    while (existing) {
+      const randomSuffix = Math.floor(100 + Math.random() * 900);
+      finalSlug = `${data.slug.toLowerCase().trim()}-${randomSuffix}`;
+      existing = await Wedding.findOne({ slug: finalSlug });
     }
 
     // Sanitize and structure ritual functions array
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     const newWedding = new Wedding({
       ...data,
       userId,
-      slug: normalizedSlug,
+      slug: finalSlug,
       displayOrder: data.displayOrder === "groom_first" ? "groom_first" : "bride_first",
       functions: sanitizedFunctions,
     });
