@@ -5,7 +5,7 @@ import Image from "next/image";
 import { UploadCloud, X, Loader2, CheckCircle2, ImagePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import imageCompression from "browser-image-compression";
-import { uploadWeddingImage } from "@/actions/upload";
+import { uploadWeddingImage, deleteCloudinaryImage } from "@/actions/upload";
 
 interface ImageUploaderProps {
   label: string;
@@ -43,23 +43,28 @@ export default function ImageUploader({
     }
 
     setError(null);
+    const previousImageUrl = value;
 
     try {
       // 1. Client-Side Smart Compression
       setStatusText("Optimizing high-res image...");
-      
+
       const compressionOptions = {
-        maxSizeMB: 1.5, // Caps file size under 1.5MB
-        maxWidthOrHeight: 1920, // Downscales massive 4K/8K images to crisp 1080p/2K
+        maxSizeMB: 1.5,
+        maxWidthOrHeight: 1920,
         useWebWorker: true,
         fileType: "image/jpeg",
-        initialQuality: 0.88, // Retains 88% visual fidelity
+        initialQuality: 0.88,
       };
 
       const compressedBlob = await imageCompression(file, compressionOptions);
-      const compressedFile = new File([compressedBlob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
-        type: "image/jpeg",
-      });
+      const compressedFile = new File(
+        [compressedBlob],
+        file.name.replace(/\.[^/.]+$/, ".jpg"),
+        {
+          type: "image/jpeg",
+        }
+      );
 
       // 2. Upload the lightweight image to Cloudinary via Server Action
       setStatusText("Uploading to Cloudinary...");
@@ -74,7 +79,16 @@ export default function ImageUploader({
         return;
       }
 
+      // 3. Update field with new image URL
       onChange(res.url);
+
+      // 4. Automatically delete the previous image from Cloudinary to free storage
+      if (previousImageUrl && previousImageUrl !== res.url) {
+        deleteCloudinaryImage(previousImageUrl).catch((err) =>
+          console.warn("Could not delete previous image:", err)
+        );
+      }
+
       setStatusText(null);
     } catch (err: any) {
       console.error("[Upload Error]:", err);
@@ -93,9 +107,18 @@ export default function ImageUploader({
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const imageToDelete = value;
+
     onChange("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+
+    // Delete removed photo from Cloudinary in background
+    if (imageToDelete) {
+      deleteCloudinaryImage(imageToDelete).catch((err) =>
+        console.warn("Cloudinary asset deletion error:", err)
+      );
     }
   };
 
@@ -152,7 +175,9 @@ export default function ImageUploader({
               <p className="text-xs font-bold text-[#FDFBF7] font-[family-name:var(--font-cinzel)] uppercase tracking-wider">
                 {statusText}
               </p>
-              <p className="text-[10px] text-[#D4AF37] mt-1">Maintaining 100% studio fidelity</p>
+              <p className="text-[10px] text-[#D4AF37] mt-1">
+                Maintaining 100% studio fidelity
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
