@@ -23,6 +23,7 @@ import ImageUploader from "@/components/ImageUploader";
 import AudioSelector from "@/components/AudioSelector";
 import { getAllTemplates } from "@/templates/registry";
 import { AUDIO_PRESETS } from "@/lib/audio-presets";
+import Link from "next/link";
 
 interface FunctionItem {
   title: string;
@@ -888,6 +889,14 @@ export default function BuilderPage() {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
+        <div>
+          <p className="text-[11px] text-gray-500 text-center leading-relaxed mt-3 font-medium">
+  By publishing, you confirm you have permission to use these photographs and agree to our{" "}
+  <Link href="/privacy" className="text-[#8B1E41] underline hover:text-[#5C1027]">
+    Privacy Policy
+  </Link>.
+</p>
+        </div>
       </div>
     </div>
   );

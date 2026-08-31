@@ -312,7 +312,6 @@ export default function SignUpPage() {
                   ? "Activating & Logging In..."
                   : "Verify & Enter Dashboard"}
               </button>
-
               <button
                 type="button"
                 onClick={() => setStep(1)}
@@ -320,6 +319,8 @@ export default function SignUpPage() {
               >
                 <ArrowLeft size={14} /> Back to Details
               </button>
+
+              
             </motion.form>
           )}
         </AnimatePresence>
@@ -332,6 +333,15 @@ export default function SignUpPage() {
             </Link>
           </p>
         </div>
+        <div>
+              <p className="text-[11px] text-gray-500 text-center leading-relaxed mt-2">
+  By creating an account, you agree to our{" "}
+  <Link href="/privacy" className="text-[#8B1E41] underline hover:text-[#5C1027]">
+    Privacy Policy
+  </Link>{" "}
+  and consent to digital invite generation.
+</p>
+          </div>
       </motion.div>
     </div>
   );
