@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Sparkles, ArrowRight, Globe, Smile, Eye, ExternalLink, Check } from "lucide-react";
@@ -13,12 +13,8 @@ export default function BuilderPage() {
   const router = useRouter();
   const availableTemplates = getAllTemplates();
 
-  const { data: session, status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      router.replace("/signin?callbackUrl=/builder");
-    },
-  });
+  // Smooth session resolution without premature client-side unauthenticated triggers
+  const { data: session, status } = useSession();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,6 +59,13 @@ export default function BuilderPage() {
     defaultFamilySignOff: "Singh",
   });
 
+  // Only redirect if NextAuth has definitively finished checking and confirmed unauthenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      window.location.href = "/signin?callbackUrl=/builder";
+    }
+  }, [status]);
+
   const updateBrideName = (name: string) => {
     const updatedBride = { ...formData.bride, name };
     let newSlug = formData.slug;
@@ -103,6 +106,10 @@ export default function BuilderPage() {
         <div className="w-8 h-8 border-4 border-[#8B1E41] border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+  if (status === "unauthenticated") {
+    return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,13 +214,12 @@ export default function BuilderPage() {
                         By {template.author.name}
                       </p>
 
-                      {/* Dedicated Preview Button Opening in New Tab with Query Param */}
                       <a
-                        href={`/templates?template=${template.id}`}
+                        href={`/templates?preview=${template.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B1E41] hover:text-[#5C1027] bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 px-2.5 py-1 rounded-lg transition-all border border-[#8B1E41]/20 shadow-xs"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B1E41] hover:text-[#5C1027] bg-[#8B1E41]/10 hover:bg-[#8B1E41]/20 px-2.5 py-1 rounded-lg transition-all border border-[#8B1E41]/20"
                         title={`Preview ${template.name} in a new tab`}
                       >
                         <Eye className="w-3 h-3" />

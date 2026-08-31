@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Loader2,
+  Info,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -34,19 +35,19 @@ function SignInContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 1. Auto-redirect if user is already logged in (resolves callbackUrl immediately)
+  // 1. Auto-forward logged-in users with a clean window redirect to avoid client loops
   useEffect(() => {
     if (status === "authenticated") {
       const isAdmin = (session?.user as any)?.role === "admin";
       if (callbackUrl) {
-        router.replace(callbackUrl);
+        window.location.href = callbackUrl;
       } else if (isAdmin) {
-        router.replace("/admin");
+        window.location.href = "/admin";
       } else {
-        router.replace("/dashboard");
+        window.location.href = "/dashboard";
       }
     }
-  }, [status, session, callbackUrl, router]);
+  }, [status, session, callbackUrl]);
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,11 +100,11 @@ function SignInContent() {
       const isAdmin = (activeSession?.user as any)?.role === "admin";
 
       if (callbackUrl) {
-        router.replace(callbackUrl);
+        window.location.href = callbackUrl;
       } else if (isAdmin) {
-        router.replace("/admin");
+        window.location.href = "/admin";
       } else {
-        router.replace("/dashboard");
+        window.location.href = "/dashboard";
       }
     } catch {
       setError("Authentication failed. Please try again.");
@@ -220,64 +221,59 @@ function SignInContent() {
           </motion.form>
         ) : (
           <motion.form
-  key="step2"
-  initial={{ opacity: 0, x: 20 }}
-  animate={{ opacity: 1, x: 0 }}
-  exit={{ opacity: 0, x: 20 }}
-  onSubmit={handleOtpSubmit}
-  className="space-y-4"
->
-  {/* Spam Folder Notice */}
-  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-    <Mail className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            key="step2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            onSubmit={handleOtpSubmit}
+            className="space-y-4"
+          >
+            {/* Highlighted Spam Alert Notice */}
+            <div className="p-3.5 bg-amber-50 border border-[#D4AF37]/50 rounded-2xl flex items-start gap-2.5 text-left shadow-xs">
+              <Info className="w-4 h-4 text-[#8B1E41] mt-0.5 flex-shrink-0" />
+              <div className="space-y-0.5">
+                <p className="text-xs font-bold text-[#8B1E41]">Can't find the email?</p>
+                <p className="text-[11px] text-gray-700 leading-relaxed">
+                  Please check your <strong>Spam / Junk</strong> folder or <strong>Promotions</strong> tab as authentication emails may occasionally arrive there.
+                </p>
+              </div>
+            </div>
 
-    <div className="text-xs text-amber-800 leading-relaxed">
-      <span className="font-bold">
-        Didn&apos;t receive the verification email?
-      </span>{" "}
-      Please check your{" "}
-      <span className="font-bold">Spam/Junk folder</span> as the email may
-      have been filtered there.
-    </div>
-  </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-900 mb-1.5 font-[family-name:var(--font-cinzel)]">
+                One-Time Password
+              </label>
+              <div className="relative">
+                <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none tracking-widest text-lg text-center font-mono font-bold text-black bg-white"
+                  required
+                  disabled={loading}
+                  placeholder="123456"
+                  maxLength={6}
+                />
+              </div>
+            </div>
 
-  <div>
-    <label className="block text-xs font-bold uppercase text-gray-900 mb-1.5 font-[family-name:var(--font-cinzel)]">
-      One-Time Password
-    </label>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-white font-bold py-3.5 rounded-xl hover:brightness-110 transition-all shadow-md disabled:opacity-50 text-xs font-[family-name:var(--font-cinzel)] uppercase tracking-wider"
+            >
+              {loading ? "Logging in..." : "Verify & Enter Dashboard"}
+            </button>
 
-    <div className="relative">
-      <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-
-      <input
-        type="text"
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-        className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8B1E41] outline-none tracking-widest text-lg text-center font-mono font-bold text-black bg-white"
-        required
-        disabled={loading}
-        placeholder="123456"
-        maxLength={6}
-      />
-    </div>
-  </div>
-
-  <button
-    type="submit"
-    disabled={loading}
-    className="w-full bg-gradient-to-r from-[#8B1E41] to-[#5C1027] text-white font-bold py-3.5 rounded-xl hover:brightness-110 transition-all shadow-md disabled:opacity-50 text-xs font-[family-name:var(--font-cinzel)] uppercase tracking-wider"
-  >
-    {loading ? "Logging in..." : "Verify & Enter Dashboard"}
-  </button>
-
-  <button
-    type="button"
-    onClick={() => setStep(1)}
-    className="w-full text-xs text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 pt-2"
-  >
-    <ArrowLeft size={14} /> Back to Credentials
-  </button>
-</motion.form>
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="w-full text-xs text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1.5 pt-2"
+            >
+              <ArrowLeft size={14} /> Back to Credentials
+            </button>
+          </motion.form>
         )}
       </AnimatePresence>
 
